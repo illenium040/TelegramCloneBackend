@@ -1,5 +1,9 @@
 using Microsoft.AspNetCore.Builder;
-using TelegramCloneBackend;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using TelegramCloneBackend.Database.Contexts;
+using TelegramCloneBackend.Database.Repositories;
+using TelegramCloneBackend.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +20,14 @@ builder.Services.AddCors(o => {
         .AllowCredentials();
     });
 });
+builder.Services.AddEntityFrameworkNpgsql()
+                .AddDbContext<ChatContext>(options =>
+                {
+                    options.UseNpgsql("Host=localhost;Port=5432;Database=Telegram;Username=postgres;Password=20612061");
+                });
+builder.Services.AddMvc();
+
+builder.Services.AddScoped<ChatRepository>();
 
 var app = builder.Build();
 
@@ -34,7 +46,13 @@ app.UseRouting();
 
 app.UseAuthorization();
 app.UseCors();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+});
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller}/{action=Index}/{id?}");
 app.MapHub<ChatHub>("hubs/notifications");
-
-
+app.MapFallbackToFile("index.html");
 app.Run();
