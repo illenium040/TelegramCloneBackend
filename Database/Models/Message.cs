@@ -1,5 +1,8 @@
-﻿namespace TelegramCloneBackend.Database.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TelegramCloneBackend.Database.Models
 {
+    [Table("Messages")]
     public class Message
     {
         public Chat Chat { get; set; }

@@ -20,14 +20,15 @@ builder.Services.AddCors(o => {
         .AllowCredentials();
     });
 });
+var connectionString = "Host=localhost;Port=5432;Database=Telegram;Username=postgres;Password=20612061";
 builder.Services.AddEntityFrameworkNpgsql()
-                .AddDbContext<ChatContext>(options =>
-                {
-                    options.UseNpgsql("Host=localhost;Port=5432;Database=Telegram;Username=postgres;Password=20612061");
-                });
+                .AddDbContext<ChatContext>(options => { options.UseNpgsql(connectionString); })
+                .AddDbContext<UserContext>(options => { options.UseNpgsql(connectionString); });
 builder.Services.AddMvc();
 
-builder.Services.AddScoped<ChatRepository>();
+builder.Services
+    .AddScoped<ChatRepository>()
+    .AddScoped<UserRepository>();
 
 var app = builder.Build();
 

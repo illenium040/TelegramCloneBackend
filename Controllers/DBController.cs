@@ -11,9 +11,11 @@ namespace TelegramCloneBackend.Controllers
     public class DBController : ControllerBase
     {
         private ChatRepository _chatRepository;
-        public DBController(ChatRepository context)
+        private UserRepository _userRepository;
+        public DBController(ChatRepository context, UserRepository userRepository)
         {
             _chatRepository = context;
+            _userRepository = userRepository;
         }
 
         [HttpGet("chat/{chatid}")]
@@ -36,7 +38,7 @@ namespace TelegramCloneBackend.Controllers
         [HttpGet("chatlist/{userid}")]
         public IEnumerable<ChatListUnit> GetChatList(string userId)
         {
-            var chatList = _chatRepository.GetUserChatList(userId);
+            var chatList = _userRepository.GetUserChatList(userId);
             foreach (var chat in chatList)
             {
                 var lm = _chatRepository.GetLastMessageFromChat(chat.Id);
@@ -68,7 +70,7 @@ namespace TelegramCloneBackend.Controllers
         [HttpGet("user/{index}")]
         public async Task<UserDTO> GetCurrentUser(int index)
         {
-            var user = _chatRepository.GetUsers()[index];
+            var user = _userRepository.GetUsers().ElementAt(index);
             return new UserDTO
             {
                 Id = user.Id,
@@ -85,14 +87,14 @@ namespace TelegramCloneBackend.Controllers
             //Add users
             var firstUserId = Guid.NewGuid().ToString();
             var secondUSerId = Guid.NewGuid().ToString();
-            _chatRepository.AddUser(new User
+            _userRepository.Add(new User
             {
                 Id = firstUserId,
                 Avatar = "images/gigachad.jpg",
                 Email = "gigachad@chad.mail.gg",
                 Name = "Виталий"
             });
-            _chatRepository.AddUser(new User
+            _userRepository.Add(new User
             {
                 Id = secondUSerId,
                 Avatar = "images/davida.jpg",
@@ -100,11 +102,35 @@ namespace TelegramCloneBackend.Controllers
                 Email = "zhizha@mail.ru"
             });
 
-            var chatId = _chatRepository.CreateChatBetweenUsers(firstUserId, secondUSerId);
-            _chatRepository.SendMessage(firstUserId, chatId, "Здарова, братан");
-            _chatRepository.SendMessage(firstUserId, chatId, "По пиуку?");
-            _chatRepository.SendMessage(secondUSerId, chatId, "Здаровa");
-            _chatRepository.SendMessage(secondUSerId, chatId, "Во сколько?");
+            var chatId = _userRepository.CreateChatBetweenUsers(firstUserId, secondUSerId);
+            _chatRepository.SendMessage(new MessageToServerDTO
+            {
+                ChatId = chatId,
+                Content = "Здарова, братан",
+                UserIdFrom = firstUserId,
+                UserIdTo = secondUSerId
+            });
+            _chatRepository.SendMessage(new MessageToServerDTO
+            {
+                ChatId = chatId,
+                Content = "По пиуку?",
+                UserIdFrom = firstUserId,
+                UserIdTo = secondUSerId
+            });
+            _chatRepository.SendMessage(new MessageToServerDTO
+            {
+                ChatId = chatId,
+                Content = "Здаровa",
+                UserIdFrom = secondUSerId,
+                UserIdTo = firstUserId
+            });
+            _chatRepository.SendMessage(new MessageToServerDTO
+            {
+                ChatId = chatId,
+                Content = "Во сколько?",
+                UserIdFrom = secondUSerId,
+                UserIdTo = firstUserId
+            });
         }
 #endif
 

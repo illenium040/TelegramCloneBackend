@@ -7,17 +7,16 @@ namespace TelegramCloneBackend.Hubs
     public class ChatHub : Hub
     {
         private ChatRepository _chatRepository;
-        public ChatHub(ChatRepository chatRepository)
+        private UserRepository _userRepository;
+        public ChatHub(ChatRepository chatRepository, UserRepository userRepository)
         {
             _chatRepository = chatRepository;
+            _userRepository = userRepository;
         }
         public async Task SendMessage(MessageToServerDTO data)
         {
-            var userToConnections = _chatRepository.GetUser(data.UserIdTo).HubConnections;
-            var userFromConnections = _chatRepository.GetUser(data.UserIdFrom).HubConnections;
-            if (!userFromConnections.Contains(Context.ConnectionId))
-                userFromConnections.Add(Context.ConnectionId);
-            var sendedMsg = _chatRepository.SendMessage(data.UserIdFrom, data.ChatId, data.Content);
+            var userToConnections = _userRepository.GetUserConnections(data.UserIdTo);
+            var sendedMsg = _chatRepository.SendMessage(data);
             var clientMessage = new MessageDTO
             {
                 Content = sendedMsg.Content,
@@ -25,16 +24,14 @@ namespace TelegramCloneBackend.Hubs
                 UserIdFrom = sendedMsg.FromUserId,
                 Id = sendedMsg.Id
             };
-            await Clients.Clients(userFromConnections).SendAsync("MessageSended", clientMessage);
-            await Clients.Clients(userToConnections).SendAsync("ReceiveMessage",clientMessage);
+            await Clients.Caller.SendAsync("MessageSended", clientMessage);
+            await Clients.Clients(userToConnections.Select(x => x.ConnectionID))
+                .SendAsync("ReceiveMessage",clientMessage);
         }
         public void SetUserHub(string userId)
         {
-            _chatRepository.SetHubConnection(userId, Context.ConnectionId);
-        }
-        public void RemoveUserHub(string userId)
-        {
-            _chatRepository.RemoveHubConnection(userId, Context.ConnectionId);
+            _userRepository.OnConnect(userId, Context.ConnectionId,
+                Context.GetHttpContext().Request.Headers["User-Agent"]);
         }
     }
 
