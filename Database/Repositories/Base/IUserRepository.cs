@@ -7,6 +7,7 @@ namespace TelegramCloneBackend.Database.Repositories.Base
     {
         void Add(User user);
         User Get(string id);
+        User GetByName(string name);
         IEnumerable<User> GetUsers();
         IEnumerable<Connection> GetUserConnections(string id);
         IEnumerable<Chat> GetUserChatList(string id);

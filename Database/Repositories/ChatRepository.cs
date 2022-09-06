@@ -15,17 +15,27 @@ namespace TelegramCloneBackend.Database.Repositories
             _chatContext = context;
         }
 
-        public Message GetLastMessageFromChat(string chatId)
+        public Message? GetLastMessageFromChat(string chatId)
         {
             var chat =  _chatContext.Chats
                 .Include(x => x.Messages)
                 .First(x => x.Id == chatId);
-            return chat.Messages.OrderBy(x => x.Created).Last();
+            if(chat.Messages.Count == 0) return null;
+            return chat.Messages.OrderBy(x => x.Created)?.Last();
         }
 
         public Chat GetChat(string chatId)
         {
             return _chatContext.Chats.Include(x => x.Messages).First(x => x.Id == chatId);
+        }
+
+        public int GetUnreadMessagesCount(string chatId)
+        {
+            return _chatContext.Messages
+                .Include(x => x.Chat)
+                .Where(x => x.Chat.Id == chatId)
+                .Count();
+                
         }
 
         public int GetMessagesCount(string chatId)
@@ -36,7 +46,7 @@ namespace TelegramCloneBackend.Database.Repositories
                 .Count();
         }
 
-        public Message SendMessage(MessageToServerDTO message)
+        public Message SendMessage(MessageDTO message)
         {
             var chat = _chatContext.Chats.First(x => x.Id == message.ChatId);
             if (chat.Messages == null)
@@ -47,7 +57,7 @@ namespace TelegramCloneBackend.Database.Repositories
                 Content = message.Content,
                 Created = DateTime.UtcNow,
                 FromUserId = message.UserIdFrom,
-                Id = Guid.NewGuid().ToString()
+                Id = message.Id ?? Guid.NewGuid().ToString()
             };
             chat.Messages.Add(msg);
             _chatContext.SaveChanges();

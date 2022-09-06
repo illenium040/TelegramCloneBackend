@@ -13,20 +13,14 @@ namespace TelegramCloneBackend.Hubs
             _chatRepository = chatRepository;
             _userRepository = userRepository;
         }
-        public async Task SendMessage(MessageToServerDTO data)
+        public async Task SendMessage(MessageDTO data)
         {
             var userToConnections = _userRepository.GetUserConnections(data.UserIdTo);
             var sendedMsg = _chatRepository.SendMessage(data);
-            var clientMessage = new MessageDTO
-            {
-                Content = sendedMsg.Content,
-                Created = sendedMsg.Created,
-                UserIdFrom = sendedMsg.FromUserId,
-                Id = sendedMsg.Id
-            };
-            await Clients.Caller.SendAsync("MessageSended", clientMessage);
+            data.Created = sendedMsg.Created;
+            await Clients.Caller.SendAsync("ReceiveMessage", data);
             await Clients.Clients(userToConnections.Select(x => x.ConnectionID))
-                .SendAsync("ReceiveMessage",clientMessage);
+                 .SendAsync("ReceiveMessage", data);
         }
         public void SetUserHub(string userId)
         {

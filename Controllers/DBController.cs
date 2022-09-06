@@ -25,7 +25,8 @@ namespace TelegramCloneBackend.Controllers
             return new ChatDTO
             {
                 Id = chat.Id,
-                Messages = chat.Messages.Select(x => new MessageDTO
+                Messages = chat.Messages.OrderBy(x => x.Created)
+                .Select(x => new MessageDTO
                 {
                     Id = x.Id,
                     Content = x.Content,
@@ -44,15 +45,9 @@ namespace TelegramCloneBackend.Controllers
                 var lm = _chatRepository.GetLastMessageFromChat(chat.Id);
                 var msc = _chatRepository.GetMessagesCount(chat.Id);
                 var user = chat.Users.First(x => x.Id != userId);
-                yield return new ChatListUnit
+                var chatListUnit = new ChatListUnit
                 {
                     ChatId = chat.Id,
-                    LastMessage = new MessageDTO() {
-                        Content = lm.Content,
-                        Created = lm.Created,
-                        UserIdFrom = lm.FromUserId,
-                        Id = lm.Id
-                    },
                     UnreadMessagesCount = msc,
                     User = new UserDTO
                     {
@@ -62,15 +57,24 @@ namespace TelegramCloneBackend.Controllers
                         Name = user.Name
                     }
                 };
+                if (lm != null)
+                    chatListUnit.LastMessage = new MessageDTO
+                    {
+                        Content = lm.Content,
+                        Created = lm.Created,
+                        Id = lm.Id,
+                        UserIdFrom = lm.FromUserId
+                    };
+                yield return chatListUnit;
             }
         }
 
 
 #if DEBUG
-        [HttpGet("user/{index}")]
-        public async Task<UserDTO> GetCurrentUser(int index)
+        [HttpGet("user/{name}")]
+        public async Task<UserDTO> GetUser(string name)
         {
-            var user = _userRepository.GetUsers().ElementAt(index);
+            var user = _userRepository.GetByName(name);
             return new UserDTO
             {
                 Id = user.Id,
@@ -78,6 +82,21 @@ namespace TelegramCloneBackend.Controllers
                 Email = user.Email,
                 Name = user.Name
             };
+        }
+
+        [HttpGet("createchat")]
+        public async Task CreateChatWithUser()
+        {
+            var id = Guid.NewGuid().ToString();
+            _userRepository.Add(new User
+            {
+                Id = id,
+                Avatar = "images/gigachad.jpg",
+                Email = "gigachad@chad.mail.gg",
+                Name = "Олег"
+            });
+            var user2 = _userRepository.GetByName("Виталий");
+            _userRepository.CreateChatBetweenUsers(id, user2.Id);
         }
 
         //used only once
@@ -103,28 +122,28 @@ namespace TelegramCloneBackend.Controllers
             });
 
             var chatId = _userRepository.CreateChatBetweenUsers(firstUserId, secondUSerId);
-            _chatRepository.SendMessage(new MessageToServerDTO
+            _chatRepository.SendMessage(new MessageDTO
             {
                 ChatId = chatId,
                 Content = "Здарова, братан",
                 UserIdFrom = firstUserId,
                 UserIdTo = secondUSerId
             });
-            _chatRepository.SendMessage(new MessageToServerDTO
+            _chatRepository.SendMessage(new MessageDTO
             {
                 ChatId = chatId,
                 Content = "По пиуку?",
                 UserIdFrom = firstUserId,
                 UserIdTo = secondUSerId
             });
-            _chatRepository.SendMessage(new MessageToServerDTO
+            _chatRepository.SendMessage(new MessageDTO
             {
                 ChatId = chatId,
                 Content = "Здаровa",
                 UserIdFrom = secondUSerId,
                 UserIdTo = firstUserId
             });
-            _chatRepository.SendMessage(new MessageToServerDTO
+            _chatRepository.SendMessage(new MessageDTO
             {
                 ChatId = chatId,
                 Content = "Во сколько?",

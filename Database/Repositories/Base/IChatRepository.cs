@@ -7,7 +7,7 @@ namespace TelegramCloneBackend.Database.Repositories.Base
     {
         int GetMessagesCount(string id);
         Chat GetChat(string id);
-        Message SendMessage(MessageToServerDTO message);
+        Message SendMessage(MessageDTO message);
         Message GetLastMessageFromChat(string id);
     }
 }

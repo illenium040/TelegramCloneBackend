@@ -44,6 +44,11 @@ namespace TelegramCloneBackend.Database.Repositories
                 .SingleOrDefault(x => x.Id == id);
         }
 
+        public User GetByName(string name)
+        {
+            return _userContext.Users.SingleOrDefault(x => x.Name == name);
+        }
+
         public IEnumerable<Chat> GetUserChatList(string id)
         {
             return _userContext.Users
