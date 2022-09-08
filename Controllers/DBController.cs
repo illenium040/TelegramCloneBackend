@@ -31,7 +31,9 @@ namespace TelegramCloneBackend.Controllers
                     Id = x.Id,
                     Content = x.Content,
                     Created = x.Created,
-                    UserIdFrom = x.FromUserId
+                    UserIdFrom = x.FromUserId,
+                    ChatId = chat.Id,
+                    State = x.MessageState
                 }).ToList()
             };
         }
@@ -122,34 +124,6 @@ namespace TelegramCloneBackend.Controllers
             });
 
             var chatId = _userRepository.CreateChatBetweenUsers(firstUserId, secondUSerId);
-            _chatRepository.SendMessage(new MessageDTO
-            {
-                ChatId = chatId,
-                Content = "Здарова, братан",
-                UserIdFrom = firstUserId,
-                UserIdTo = secondUSerId
-            });
-            _chatRepository.SendMessage(new MessageDTO
-            {
-                ChatId = chatId,
-                Content = "По пиуку?",
-                UserIdFrom = firstUserId,
-                UserIdTo = secondUSerId
-            });
-            _chatRepository.SendMessage(new MessageDTO
-            {
-                ChatId = chatId,
-                Content = "Здаровa",
-                UserIdFrom = secondUSerId,
-                UserIdTo = firstUserId
-            });
-            _chatRepository.SendMessage(new MessageDTO
-            {
-                ChatId = chatId,
-                Content = "Во сколько?",
-                UserIdFrom = secondUSerId,
-                UserIdTo = firstUserId
-            });
         }
 #endif
 

@@ -9,5 +9,6 @@ namespace TelegramCloneBackend.Database.Repositories.Base
         Chat GetChat(string id);
         Message SendMessage(MessageDTO message);
         Message GetLastMessageFromChat(string id);
+        void ReadMessages(IEnumerable<string> messages, string chatId);
     }
 }

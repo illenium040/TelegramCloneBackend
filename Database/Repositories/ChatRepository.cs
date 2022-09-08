@@ -7,7 +7,7 @@ using TelegramCloneBackend.Database.Models.DTO;
 
 namespace TelegramCloneBackend.Database.Repositories
 {
-    public class ChatRepository : IChatRepository, IMessageRepository
+    public class ChatRepository : IChatRepository
     {
         private ChatContext _chatContext;
         public ChatRepository(ChatContext context)
@@ -42,7 +42,7 @@ namespace TelegramCloneBackend.Database.Repositories
         {
             return _chatContext.Messages
                 .Include(x => x.Chat)
-                .Where(x => x.Chat.Id == chatId)
+                .Where(x => x.Chat.Id == chatId && x.MessageState == MessageState.SENDED_TO_USER)
                 .Count();
         }
 
@@ -57,11 +57,35 @@ namespace TelegramCloneBackend.Database.Repositories
                 Content = message.Content,
                 Created = DateTime.UtcNow,
                 FromUserId = message.UserIdFrom,
-                Id = message.Id ?? Guid.NewGuid().ToString()
+                Id = message.Id ?? Guid.NewGuid().ToString(),
+                ContentType = message.ContentType,
+                ToUserId = message.UserIdTo,
+                MessageState = MessageState.SENDED_TO_SERVER
             };
             chat.Messages.Add(msg);
             _chatContext.SaveChanges();
             return msg;
+        }
+
+        public Message SendToUser(MessageDTO message)
+        {
+            var chat = _chatContext.Chats.First(x => x.Id == message.ChatId);
+            var msg = _chatContext.Messages.FirstOrDefault(x => x.Id == message.Id);
+            msg.MessageState = MessageState.SENDED_TO_USER;
+            _chatContext.SaveChanges();
+            return msg;
+        }
+
+        public void ReadMessages(IEnumerable<string> messages, string chatId)
+        {
+            var chat = _chatContext.Chats.
+                Include(x => x.Messages)
+                .FirstOrDefault(x => x.Id == chatId);
+            if (chat == null) return;
+            var selected = chat.Messages.IntersectBy(messages, x => x.Id);
+            foreach (var msg in selected)
+                msg.MessageState = MessageState.READ;
+            _chatContext.SaveChanges();
         }
     }
 }
