@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TelegramCloneBackend.Database.Models;
+using Database.Models;
 
-namespace TelegramCloneBackend.Database.Contexts
+namespace Database.Contexts
 {
     public class ChatContext : DbContextBase
     {

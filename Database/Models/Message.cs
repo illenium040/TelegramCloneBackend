@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using TelegramCloneBackend.Database.Models.DTO;
+using Database.Models.DTO;
 
-namespace TelegramCloneBackend.Database.Models
+namespace Database.Models
 {
     [Table("Messages")]
     public class Message

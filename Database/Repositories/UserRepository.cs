@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TelegramCloneBackend.Database.Contexts;
-using TelegramCloneBackend.Database.Models;
-using TelegramCloneBackend.Database.Repositories.Base;
+using Database.Contexts;
+using Database.Models;
+using Database.Repositories.Base;
 
-namespace TelegramCloneBackend.Database.Repositories
+namespace Database.Repositories
 {
     public class UserRepository : IUserRepository, IConnectionRepository
     {
@@ -46,7 +46,7 @@ namespace TelegramCloneBackend.Database.Repositories
 
         public User GetByName(string name)
         {
-            return _userContext.Users.SingleOrDefault(x => x.Name == name);
+            return _userContext.Users.SingleOrDefault(x => x.DisplayName == name);
         }
 
         public IEnumerable<Chat> GetUserChatList(string id)
@@ -68,7 +68,7 @@ namespace TelegramCloneBackend.Database.Repositories
 
         public IEnumerable<User> GetUsers()
         {
-            return _userContext.Users.OrderBy(x => x.Name).ToList();
+            return _userContext.Users.OrderBy(x => x.DisplayName).ToList();
         }
 
 

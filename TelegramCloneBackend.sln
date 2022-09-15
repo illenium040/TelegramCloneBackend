@@ -3,12 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramCloneBackend", "TelegramCloneBackend.csproj", "{0CAD615C-4D56-4105-938C-0F30675B171B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramCloneBackend", "TelegramCloneBackend\TelegramCloneBackend.csproj", "{0CAD615C-4D56-4105-938C-0F30675B171B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{647D748C-3752-4833-A34A-1E991FD0DDA3}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseLayer", "Database\DatabaseLayer.csproj", "{9AA84E12-9DF2-4F13-BE8C-B73B3AAE383A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MidiatRHandlers", "MidiatRHandlers\MidiatRHandlers.csproj", "{67506553-B758-4C22-8B37-05441E3E307F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +24,14 @@ Global
 		{0CAD615C-4D56-4105-938C-0F30675B171B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CAD615C-4D56-4105-938C-0F30675B171B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CAD615C-4D56-4105-938C-0F30675B171B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AA84E12-9DF2-4F13-BE8C-B73B3AAE383A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AA84E12-9DF2-4F13-BE8C-B73B3AAE383A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AA84E12-9DF2-4F13-BE8C-B73B3AAE383A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AA84E12-9DF2-4F13-BE8C-B73B3AAE383A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67506553-B758-4C22-8B37-05441E3E307F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67506553-B758-4C22-8B37-05441E3E307F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67506553-B758-4C22-8B37-05441E3E307F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67506553-B758-4C22-8B37-05441E3E307F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

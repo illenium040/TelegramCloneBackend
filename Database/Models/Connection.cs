@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace TelegramCloneBackend.Database.Models
+namespace Database.Models
 {
     [Table("Connections")]
     public class Connection

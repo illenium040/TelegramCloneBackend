@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TelegramCloneBackend.Database.Models;
+using Database.Models;
 
-namespace TelegramCloneBackend.Database.Contexts
+namespace Database.Contexts
 {
-    public class UserContext : DbContextBase
+    public class UserContext : IdentityDbBase
     {
         public UserContext(DbContextOptions<UserContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }

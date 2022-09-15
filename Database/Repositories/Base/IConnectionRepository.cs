@@ -1,4 +1,4 @@
-﻿namespace TelegramCloneBackend.Database.Repositories.Base
+﻿namespace Database.Repositories.Base
 {
     public interface IConnectionRepository
     {

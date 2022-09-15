@@ -1,7 +1,7 @@
 ﻿using System.Collections;
-using TelegramCloneBackend.Database.Models;
+using Database.Models;
 
-namespace TelegramCloneBackend.Database.Repositories.Base
+namespace Database.Repositories.Base
 {
     public interface IUserRepository
     {

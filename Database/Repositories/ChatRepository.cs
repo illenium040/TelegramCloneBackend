@@ -1,11 +1,11 @@
-﻿using TelegramCloneBackend.Database.Contexts;
-using TelegramCloneBackend.Database.Models;
+﻿using Database.Contexts;
+using Database.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using TelegramCloneBackend.Database.Repositories.Base;
-using TelegramCloneBackend.Database.Models.DTO;
+using Database.Repositories.Base;
+using Database.Models.DTO;
 
-namespace TelegramCloneBackend.Database.Repositories
+namespace Database.Repositories
 {
     public class ChatRepository : IChatRepository
     {
@@ -29,11 +29,13 @@ namespace TelegramCloneBackend.Database.Repositories
             return _chatContext.Chats.Include(x => x.Messages).First(x => x.Id == chatId);
         }
 
-        public int GetUnreadMessagesCount(string chatId)
+        public int GetUnreadMessagesCount(string chatId, string userId)
         {
             return _chatContext.Messages
                 .Include(x => x.Chat)
-                .Where(x => x.Chat.Id == chatId)
+                .Where(x => x.Chat.Id == chatId && 
+                    x.MessageState == MessageState.SENDED_TO_USER &&
+                    x.FromUserId != userId)
                 .Count();
                 
         }

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using TelegramCloneBackend.Database.Models.DTO;
-using TelegramCloneBackend.Database.Repositories;
+using Database.Models.DTO;
+using Database.Repositories;
 
-namespace TelegramCloneBackend.Hubs
+namespace TGBackend.Hubs
 {
     public class ChatHub : Hub
     {
@@ -14,12 +14,12 @@ namespace TelegramCloneBackend.Hubs
             _userRepository = userRepository;
         }
 
-        public async Task ReadMessage(IEnumerable<string> messsageIds, string chatId, string targetUserId)
+        public async Task ReadMessage(IEnumerable<string> messageIds, string chatId, string targetUserId)
         {
             var connections = _userRepository.GetUserConnections(targetUserId);
-            _chatRepository.ReadMessages(messsageIds, chatId);
-            await Clients.Clients(connections.Select(x => x.ConnectionID)).SendAsync("ReadMessages", messsageIds, chatId, targetUserId);
-            await Clients.Caller.SendAsync("ReadMessages", messsageIds, chatId, targetUserId);
+            _chatRepository.ReadMessages(messageIds, chatId);
+            await Clients.Clients(connections.Select(x => x.ConnectionID)).SendAsync("ReadMessage", messageIds, chatId, targetUserId);
+            await Clients.Caller.SendAsync("ReadMessage", messageIds, chatId, targetUserId);
         }
 
         public async Task SendMessage(MessageDTO data)

@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TelegramCloneBackend.Database.Contexts;
-using TelegramCloneBackend.Database.Models;
-using TelegramCloneBackend.Database.Models.DTO;
-using TelegramCloneBackend.Database.Repositories;
+using Database.Contexts;
+using Database.Models;
+using Database.Models.DTO;
+using Database.Repositories;
 
-namespace TelegramCloneBackend.Controllers
+namespace TGBackend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
@@ -45,7 +45,7 @@ namespace TelegramCloneBackend.Controllers
             foreach (var chat in chatList)
             {
                 var lm = _chatRepository.GetLastMessageFromChat(chat.Id);
-                var msc = _chatRepository.GetMessagesCount(chat.Id);
+                var msc = _chatRepository.GetUnreadMessagesCount(chat.Id, userId);
                 var user = chat.Users.First(x => x.Id != userId);
                 var chatListUnit = new ChatListUnit
                 {
@@ -56,7 +56,7 @@ namespace TelegramCloneBackend.Controllers
                         Avatar = user.Avatar,
                         Email = user.Email,
                         Id = user.Id,
-                        Name = user.Name
+                        Name = user.DisplayName
                     }
                 };
                 if (lm != null)
@@ -82,7 +82,7 @@ namespace TelegramCloneBackend.Controllers
                 Id = user.Id,
                 Avatar = user.Avatar,
                 Email = user.Email,
-                Name = user.Name
+                Name = user.DisplayName
             };
         }
 
@@ -95,7 +95,7 @@ namespace TelegramCloneBackend.Controllers
                 Id = id,
                 Avatar = "images/gigachad.jpg",
                 Email = "gigachad@chad.mail.gg",
-                Name = "Олег"
+                DisplayName = "Олег"
             });
             var user2 = _userRepository.GetByName("Виталий");
             _userRepository.CreateChatBetweenUsers(id, user2.Id);
@@ -113,13 +113,13 @@ namespace TelegramCloneBackend.Controllers
                 Id = firstUserId,
                 Avatar = "images/gigachad.jpg",
                 Email = "gigachad@chad.mail.gg",
-                Name = "Виталий"
+                DisplayName = "Виталий"
             });
             _userRepository.Add(new User
             {
                 Id = secondUSerId,
                 Avatar = "images/davida.jpg",
-                Name = "Давыда",
+                DisplayName = "Давыда",
                 Email = "zhizha@mail.ru"
             });
 

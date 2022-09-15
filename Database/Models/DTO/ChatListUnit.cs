@@ -1,4 +1,4 @@
-﻿namespace TelegramCloneBackend.Database.Models.DTO
+﻿namespace Database.Models.DTO
 {
     public class ChatListUnit
     {
