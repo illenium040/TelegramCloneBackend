@@ -11,7 +11,7 @@
 ![EFCore](https://img.shields.io/badge/-EFCore-090909?style=for-the-badge&logo=efcore)
 ![MediatR](https://img.shields.io/badge/-MediatR-090909?style=for-the-badge&logo=efcore)
 ![JWT](https://img.shields.io/badge/-JWT-090909?style=for-the-badge&logo=jwt)
-
+![Postgre](https://img.shields.io/badge/-POSTGRESQL-090909?style=for-the-badge&logo=postgresql)
 ### На данный момент работаю над:
 - Расширение API
 - Безопасность данных и запросов к API
