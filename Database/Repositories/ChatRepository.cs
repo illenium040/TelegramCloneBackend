@@ -24,9 +24,9 @@ namespace Database.Repositories
             return chat.Messages.OrderBy(x => x.Created)?.Last();
         }
 
-        public Chat GetChat(string chatId)
+        public Chat? GetChat(string chatId)
         {
-            return _chatContext.Chats.Include(x => x.Messages).First(x => x.Id == chatId);
+            return _chatContext.Chats.Include(x => x.Messages).FirstOrDefault(x => x.Id == chatId);
         }
 
         public int GetUnreadMessagesCount(string chatId, string userId)
@@ -37,7 +37,6 @@ namespace Database.Repositories
                     x.MessageState == MessageState.SENDED_TO_USER &&
                     x.FromUserId != userId)
                 .Count();
-                
         }
 
         public int GetMessagesCount(string chatId)
@@ -88,6 +87,18 @@ namespace Database.Repositories
             foreach (var msg in selected)
                 msg.MessageState = MessageState.READ;
             _chatContext.SaveChanges();
+        }
+
+        public bool IsChatExisting(string user1, string user2)
+        {
+            var usersChatsCount = _chatContext.Chats
+                .Include(x => x.Users)
+                .Select(x => x.Users)
+                .Where(x => x.Select(x => x.Id).Contains(user1))
+                .Where(x => x.Select(x => x.Id).Contains(user2))
+                .Count();
+
+            return usersChatsCount > 0;
         }
     }
 }

@@ -23,6 +23,7 @@ namespace Database.Repositories
         {
             var user1 = _userContext.Users.First(x => x.Id == firstUserId);
             var user2 = _userContext.Users.First(x => x.Id == secondUserId);
+
             var chat = new Chat()
             {
                 Id = Guid.NewGuid().ToString(),

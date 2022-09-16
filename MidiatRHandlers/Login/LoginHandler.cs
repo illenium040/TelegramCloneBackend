@@ -5,10 +5,11 @@ using System.Net;
 using Database.Models;
 using MediatR.JWT;
 using MediatR.Handlers.Models;
+using MidiatRHandlers;
 
 namespace MediatR.Handlers.Login
 {
-    public class LoginHandler : IRequestHandler<LoginQuery, UserModel>
+    public class LoginHandler : IRequestHandler<LoginQuery, RequestResult<UserModel>>
     {
 		private readonly UserManager<User> _userManager;
 		private readonly IJwtGenerator _jwtGenerator;
@@ -21,27 +22,41 @@ namespace MediatR.Handlers.Login
 			_jwtGenerator = gen;
 		}
 
-		public async Task<UserModel> Handle(LoginQuery request, CancellationToken cancellationToken)
+		public async Task<RequestResult<UserModel>> Handle(LoginQuery request, CancellationToken cancellationToken)
 		{
 			var user = await _userManager.FindByEmailAsync(request.Email);
 			if (user == null)
 			{
-				throw new RestException(HttpStatusCode.Unauthorized.ToString());
+				return new RequestResult<UserModel>
+				{
+					Succeeded = false,
+					Status = HttpStatusCode.Unauthorized
+				};
 			}
 
 			var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
 
 			if (result.Succeeded)
 			{
-				return new UserModel
-				{
-					DisplayName = user.DisplayName,
-					Token = _jwtGenerator.CreateToken(user),                         
-					UserName = user.UserName
+				return new RequestResult<UserModel>
+                {
+					Data = new UserModel
+					{
+						Avatar = user.Avatar,
+						DisplayName = user.DisplayName,
+						Token = _jwtGenerator.CreateToken(user),
+						Name = user.UserName,
+						Id = user.Id,
+					},
+					Status = HttpStatusCode.OK,
+					Succeeded = true
 				};
 			}
-
-			throw new RestException(HttpStatusCode.Unauthorized.ToString());
+			return new RequestResult<UserModel>
+			{
+				Succeeded = false,
+				Status = HttpStatusCode.Unauthorized,
+			};
 		}
 	}
 }

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Database.Models;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
 
 namespace MediatR.JWT
 {
@@ -34,7 +35,6 @@ namespace MediatR.JWT
 			var token = tokenHandler.CreateToken(tokenDescriptor);
 
 			return tokenHandler.WriteToken(token);
-		}
-    
+		} 
     }
 }

@@ -2,26 +2,22 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using MediatR;
 using Database.Contexts;
 using Database.Models;
 using Database.Repositories;
 using MediatR.Handlers.Login;
 using MediatR.JWT;
 using TGBackend.Hubs;
+using MidiatRHandlers.JWT;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 builder.Services.AddCors(o => {
@@ -40,8 +36,6 @@ builder.Services.AddEntityFrameworkNpgsql()
                 .AddDbContext<UserContext>(options => { options.UseNpgsql(connectionString); });
 builder.Services.AddMvc(option =>
 {
-    // ќтключаем маршрутизацию конечных точек на основе endpoint-based logic из EndpointMiddleware
-    // и продолжаем использование маршрутизации на основе IRouter. 
     option.EnableEndpointRouting = false;
     var policy = new AuthorizationPolicyBuilder()
                         .RequireAuthenticatedUser().RequireAuthenticatedUser().Build();
@@ -51,7 +45,11 @@ builder.Services.AddMvc(option =>
 builder.Services.AddMediatR(typeof(LoginHandler));
 
 builder.Services
-    .AddIdentityCore<User>()
+    .AddIdentityCore<User>((options) =>
+    {
+        options.User.AllowedUserNameCharacters =
+        "јаЅб¬в√гƒд≈е®Є∆ж«з»и…й кЋлћмЌнќоѕп–р—с“т”у‘ф’х÷ц„чЎшўщЏъџы№ьЁэёюя€abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+    })
     .AddEntityFrameworkStores<UserContext>()
     .AddSignInManager<SignInManager<User>>();
 
@@ -66,24 +64,28 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(
         opt =>
         {
+            opt.SaveToken = true;
+            opt.RequireHttpsMetadata = false;
             opt.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = key,
                 ValidateAudience = false,
                 ValidateIssuer = false,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
             };
         });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+app.UseMiddleware<JwtMiddleware>();
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -103,5 +105,7 @@ app.UseEndpoints(endpoints =>
 //    pattern: "{controller}/{action=Index}/{id?}");
 app.MapHub<ChatHub>("hubs/notifications");
 app.MapFallbackToFile("index.html");
+
+
 
 app.Run();
