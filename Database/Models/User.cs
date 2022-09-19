@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DatabaseLayer.Models;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Database.Models
@@ -8,8 +9,8 @@ namespace Database.Models
     {
         public string DisplayName { get; set; }
         public string? Avatar { get; set; }
-        public ICollection<Chat>? Chats { get; set; } = new List<Chat>();
-        public ICollection<Connection>? Connections { get; set; } = new List<Connection>();
+        public ICollection<ChatToUser> Chats { get; set; } = new List<ChatToUser>();
+        public ICollection<Connection> Connections { get; set; } = new List<Connection>();
 
     }
 }

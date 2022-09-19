@@ -6,15 +6,15 @@ namespace MidiatRHandlers.Chat.GetWithMessages
 {
     public class ChatWithMessagesHandler : IRequestHandler<ChatWithMessagesQuery, RequestResult<ChatDTO>>
     {
-        private readonly ChatRepository _chatRepository;
-        public ChatWithMessagesHandler(ChatRepository chat)
+        private readonly PrivateChatRepository _chatRepository;
+        public ChatWithMessagesHandler(PrivateChatRepository chat)
         {
             _chatRepository = chat;
         }
         public async Task<RequestResult<ChatDTO>> Handle(ChatWithMessagesQuery request, CancellationToken cancellationToken)
         {
-            var chat = _chatRepository.GetChat(request.ChatId);
-            if (chat == null) return new RequestResult<ChatDTO>
+            var messages = _chatRepository.GetMessages(request.ChatId);
+            if (messages == null) return new RequestResult<ChatDTO>
             {
                 Errors = new List<string>() { "Chat not found" },
                 Status = System.Net.HttpStatusCode.BadRequest
@@ -26,15 +26,15 @@ namespace MidiatRHandlers.Chat.GetWithMessages
                 Succeeded = true,
                 Data = new ChatDTO
                 {
-                    Id = chat.Id,
-                    Messages = chat.Messages.OrderBy(x => x.Created)
+                    Id = request.ChatId,
+                    Messages = messages.OrderBy(x => x.Created)
                     .Select(x => new MessageDTO
                     {
                         Id = x.Id,
                         Content = x.Content,
                         Created = x.Created,
                         UserIdFrom = x.FromUserId,
-                        ChatId = chat.Id,
+                        ChatId = request.ChatId,
                         State = x.MessageState
                     }).ToList()
                 }

@@ -15,6 +15,8 @@ using MediatR.Handlers.Login;
 using MediatR.JWT;
 using TGBackend.Hubs;
 using MidiatRHandlers.JWT;
+using TelegramCloneBackend;
+using DatabaseLayer.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,8 +55,9 @@ builder.Services
     .AddEntityFrameworkStores<UserContext>()
     .AddSignInManager<SignInManager<User>>();
 
-builder.Services.AddScoped<ChatRepository>()
-    .AddScoped<UserRepository>();
+builder.Services.AddScoped<PrivateChatRepository>()
+    .AddScoped<UserRepository>()
+    .AddScoped<UserChatRepository>();
 builder.Services.AddScoped<IJwtGenerator, DefaultJwtGenerator>();
 builder.Services.TryAddSingleton<ISystemClock, SystemClock>();
 
@@ -106,6 +109,11 @@ app.UseEndpoints(endpoints =>
 app.MapHub<ChatHub>("hubs/notifications");
 app.MapFallbackToFile("index.html");
 
-
+var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+using (var scope = scopeFactory.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    DbSeed.SeedUsers(userManager);
+}
 
 app.Run();

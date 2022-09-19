@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Database.Models;
+using DatabaseLayer.Models;
 
 namespace Database.Repositories.Base
 {
@@ -10,7 +11,6 @@ namespace Database.Repositories.Base
         User GetByName(string name);
         IEnumerable<User> GetUsers();
         IEnumerable<Connection> GetUserConnections(string id);
-        IEnumerable<Chat> GetUserChatList(string id);
-        string CreateChatBetweenUsers(string firstUserId, string secondUserId);
+        IEnumerable<User> Seacrh(string name);
     }
 }

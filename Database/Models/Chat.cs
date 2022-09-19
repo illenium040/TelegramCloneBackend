@@ -1,13 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using Database.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Database.Models
+namespace DatabaseLayer.Models
 {
     [Table("Chats")]
     public class Chat
     {
         public string Id { get; set; }
-        public List<Message>? Messages { get; set; } = new List<Message>();
-        public List<User> Users { get; set; } = new List<User>();
-
+        public ICollection<Message>? Messages { get; set; } = new List<Message>();
+        public ICollection<ChatToUser> Users { get; set; }
+        public bool IsPrivate { get; set; } = true;
     }
 }

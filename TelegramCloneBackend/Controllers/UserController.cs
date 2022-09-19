@@ -1,16 +1,13 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MediatR.Handlers;
 using MediatR.Handlers.Login;
 using MediatR.Handlers.Models;
 using MidiatRHandlers.Register;
 using MidiatRHandlers;
 using Database.Repositories;
 using Database.Models;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
+using Database.Models.DTO;
 
 namespace TGBackend.Controllers
 {
@@ -28,17 +25,33 @@ namespace TGBackend.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<RequestResult<UserModel>> LoginAsync(LoginQuery query)
-        {
-            return await _mediator.Send(query);
-        }
+        public async Task<RequestResult<UserModel>> LoginAsync(LoginQuery query) => await _mediator.Send(query);
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<RequestResult> RegisterAsync(RegisterQuery query)
+        public async Task<RequestResult> RegisterAsync(RegisterQuery query) => await _mediator.Send(query);
+
+        [HttpGet("search/{userName}")]
+        public async Task<RequestResult<IEnumerable<UserDTO>>> SearchAsync(string userName)
         {
-            return await _mediator.Send(query);
+            if (string.IsNullOrEmpty(userName)) return null;
+            
+            var users = _userRepository.Seacrh(userName)
+            .Select(x => new UserDTO
+            {
+                Id = x.Id,
+                Name = x.DisplayName,
+                LoginName = x.UserName,
+                Email = x.Email,
+                Avatar = x.Avatar
+            }).ToList();
+            return new RequestResult<IEnumerable<UserDTO>>
+            {
+                Data = users,
+                Status = System.Net.HttpStatusCode.OK
+            };
         }
+
 
 #if DEBUG
         [AllowAnonymous]

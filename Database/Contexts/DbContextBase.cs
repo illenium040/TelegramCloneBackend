@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Database.Models;
+using DatabaseLayer.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace Database.Contexts
 {
@@ -12,32 +14,40 @@ namespace Database.Contexts
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //Set up keys
-            modelBuilder.Entity<User>()
-                .HasKey(x => x.Id);
-            modelBuilder.Entity<Chat>()
-                .HasKey(x => x.Id);
-            modelBuilder.Entity<Message>()
-                .HasKey(x => x.Id);
-            modelBuilder.Entity<Connection>()
-                .HasKey(x => x.Id);
-            //Set up relations
-            modelBuilder.Entity<Chat>()
-                .HasMany(x => x.Users)
-                .WithMany(x => x.Chats);
-            modelBuilder.Entity<User>()
-                .HasMany(x => x.Chats)
-                .WithMany(x => x.Users);
-            modelBuilder.Entity<Message>()
-                .HasOne(x => x.Chat)
-                .WithMany(x => x.Messages);
-            modelBuilder.Entity<Connection>()
-                .HasOne(x => x.User)
-                .WithMany(x => x.Connections);
+            modelBuilder.Entity<Message>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.HasOne(x => x.Chat).WithMany(x => x.Messages).HasForeignKey(x => x.ChatId);
+            });
+            modelBuilder.Entity<Chat>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.HasMany(x => x.Users).WithOne(x => x.Chat).HasForeignKey(x => x.ChatId);
+                e.HasMany(x => x.Messages).WithOne(x => x.Chat).HasForeignKey(x => x.ChatId);
+            });
 
-            modelBuilder.Entity<Connection>()
-                .Property(x => x.Id)
-                .UseSerialColumn();
+            modelBuilder.Entity<User>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.HasMany(x => x.Chats).WithOne(x => x.User).HasForeignKey(x => x.UserId);
+            });
+
+            modelBuilder.Entity<ChatToUser>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.Property(x => x.Id).UseSerialColumn().ValueGeneratedOnAdd();
+                e.HasOne(x => x.User).WithMany(x => x.Chats).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+                e.HasOne(x => x.Chat).WithMany(x => x.Users).HasForeignKey(x => x.ChatId).OnDelete(DeleteBehavior.Cascade);
+            });
+
+            modelBuilder.Entity<Connection>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.HasOne(x => x.User).WithMany(x => x.Connections);
+                e.Property(x => x.Id).UseSerialColumn();
+            });
         }
+
+        
     }
 }

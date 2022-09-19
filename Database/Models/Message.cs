@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Database.Models.DTO;
+using DatabaseLayer.Models;
 
 namespace Database.Models
 {
     [Table("Messages")]
     public class Message
     {
+        public string ChatId { get; set; }
         public Chat Chat { get; set; }
         public string Id { get; set; }
         public string FromUserId { get; set; }

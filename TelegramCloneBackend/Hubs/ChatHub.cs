@@ -1,17 +1,20 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Database.Models.DTO;
 using Database.Repositories;
+using DatabaseLayer.Repositories;
 
 namespace TGBackend.Hubs
 {
     public class ChatHub : Hub
     {
-        private ChatRepository _chatRepository;
+        private PrivateChatRepository _chatRepository;
         private UserRepository _userRepository;
-        public ChatHub(ChatRepository chatRepository, UserRepository userRepository)
+        private UserChatRepository _userChatRepository;
+        public ChatHub(PrivateChatRepository chatRepository, UserRepository userRepository, UserChatRepository userChat)
         {
             _chatRepository = chatRepository;
             _userRepository = userRepository;
+            _userChatRepository = userChat;
         }
 
         public async Task ReadMessage(IEnumerable<string> messageIds, string chatId, string targetUserId)
@@ -25,10 +28,11 @@ namespace TGBackend.Hubs
         public async Task SendMessage(MessageDTO data)
         {
             var userToConnections = _userRepository.GetUserConnections(data.UserIdTo);
-            var sendedMsg = _chatRepository.SendMessage(data);
+            var sendedMsg = _userChatRepository.SendMessage(data);
             data.Created = sendedMsg.Created;
             await Clients.Clients(userToConnections.Select(x => x.ConnectionID)).SendAsync("ReceiveMessage", data);
-            _chatRepository.SendToUser(data);
+            var msg = _userChatRepository.SendToUser(data);
+            data.State = msg.MessageState;
             await Clients.Caller.SendAsync("ReceiveMessage", data);
             
         }

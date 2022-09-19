@@ -1,5 +1,6 @@
 ﻿using Database.Models;
 using Database.Models.DTO;
+using DatabaseLayer.Models;
 
 namespace Database.Repositories.Base
 {
@@ -7,8 +8,7 @@ namespace Database.Repositories.Base
     {
         int GetMessagesCount(string id);
         int GetUnreadMessagesCount(string chatId, string userId);
-        Chat GetChat(string id);
-        Message SendMessage(MessageDTO message);
+        IEnumerable<Message> GetMessages(string id);
         Message GetLastMessageFromChat(string id);
         void ReadMessages(IEnumerable<string> messages, string chatId);
     }

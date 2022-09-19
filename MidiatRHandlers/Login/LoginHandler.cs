@@ -43,9 +43,8 @@ namespace MediatR.Handlers.Login
 					Data = new UserModel
 					{
 						Avatar = user.Avatar,
-						DisplayName = user.DisplayName,
 						Token = _jwtGenerator.CreateToken(user),
-						Name = user.UserName,
+						DisplayName = user.DisplayName,
 						Id = user.Id,
 					},
 					Status = HttpStatusCode.OK,

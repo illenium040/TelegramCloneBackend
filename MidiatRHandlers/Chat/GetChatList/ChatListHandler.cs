@@ -1,16 +1,18 @@
 ﻿using Database.Models;
 using Database.Models.DTO;
 using Database.Repositories;
+using DatabaseLayer.Models;
+using DatabaseLayer.Repositories;
 using MediatR;
 
 namespace MidiatRHandlers.Chat.GetChatList
 {
     internal class ChatListHandler : IRequestHandler<ChatListQuery, RequestResult<IEnumerable<ChatListUnit>>>
     {
-        private readonly ChatRepository _chatRepository;
-        private readonly UserRepository _userRepository;
+        private readonly PrivateChatRepository _chatRepository;
+        private readonly UserChatRepository _userRepository;
 
-        public ChatListHandler(ChatRepository chatRepository, UserRepository repository)
+        public ChatListHandler(PrivateChatRepository chatRepository, UserChatRepository repository)
         {
             _chatRepository = chatRepository;
             _userRepository = repository;
@@ -18,6 +20,12 @@ namespace MidiatRHandlers.Chat.GetChatList
         public async Task<RequestResult<IEnumerable<ChatListUnit>>> Handle(ChatListQuery request, CancellationToken cancellationToken)
         {
             var chatList = _userRepository.GetUserChatList(request.UserId);
+            if (!chatList.Any()) return new RequestResult<IEnumerable<ChatListUnit>>
+            {
+                Data = Enumerable.Empty<ChatListUnit>(),
+                Status = System.Net.HttpStatusCode.OK,
+                Succeeded = true
+            };
             var units = GetUnits(chatList, request.UserId).ToList();
             return new RequestResult<IEnumerable<ChatListUnit>>
             {
@@ -27,13 +35,13 @@ namespace MidiatRHandlers.Chat.GetChatList
             };
         }
 
-        private IEnumerable<ChatListUnit> GetUnits(IEnumerable<Database.Models.Chat> chatList, string userId)
+        private IEnumerable<ChatListUnit> GetUnits(IEnumerable<DatabaseLayer.Models.Chat> chatList, string userId)
         {
             foreach (var chat in chatList)
             {
                 var lm = _chatRepository.GetLastMessageFromChat(chat.Id);
                 var msc = _chatRepository.GetUnreadMessagesCount(chat.Id, userId);
-                var user = chat.Users.First(x => x.Id != userId);
+                var user = chat.Users.SingleOrDefault(x => x.UserId != userId)?.User;
                 var chatListUnit = new ChatListUnit
                 {
                     ChatId = chat.Id,
