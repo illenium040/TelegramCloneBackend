@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Database.Models;
+using DatabaseLayer.Models;
 using DatabaseLayer.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace Database.Contexts
+namespace DatabaseLayer.Contexts
 {
     public class DbContextBase : DbContext
     {

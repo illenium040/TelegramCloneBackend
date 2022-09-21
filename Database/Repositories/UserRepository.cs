@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Database.Contexts;
-using Database.Models;
-using Database.Repositories.Base;
+using DatabaseLayer.Contexts;
+using DatabaseLayer.Models;
+using DatabaseLayer.Repositories.Base;
 using DatabaseLayer.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace Database.Repositories
+namespace DatabaseLayer.Repositories
 {
     public class UserRepository : IUserRepository, IConnectionRepository
     {
@@ -17,11 +17,7 @@ namespace Database.Repositories
             _manager = manager;
         }
 
-        public void Add(User user)
-        {
-            _userContext.Users.Add(user);
-            _userContext.SaveChanges();
-        }
+        public void Add(User user) => _userContext.Users.Add(user);
 
         public IEnumerable<User> Seacrh(string name)
         {
@@ -34,18 +30,16 @@ namespace Database.Repositories
                 .AsEnumerable();
         }
 
-        public User Get(string id)
-        {
-            return _userContext.Users
-                .SingleOrDefault(x => x.Id == id);
-        }
+        public User? Get(string id) => _userContext.Users.SingleOrDefault(x => x.Id == id);
 
-        public User GetByName(string name)
-        {
-            return _userContext.Users.SingleOrDefault(x => x.DisplayName == name);
-        }
+        public User? GetByName(string name) => _userContext.Users.SingleOrDefault(x => x.DisplayName == name);
 
-        
+        public IEnumerable<User> GetAll() => _userContext.Users.AsNoTracking().ToList();
+        public void Save() => _userContext.SaveChanges();
+        public IEnumerable<User> GetUsers() => _userContext.Users.OrderBy(x => x.DisplayName).ToList();
+
+
+
         public IEnumerable<Connection> GetUserConnections(string id)
         {
             var user = _userContext.Users
@@ -53,12 +47,6 @@ namespace Database.Repositories
                 .SingleOrDefault(x => x.Id == id);
             return user?.Connections ?? Enumerable.Empty<Connection>();
         }
-
-        public IEnumerable<User> GetUsers()
-        {
-            return _userContext.Users.OrderBy(x => x.DisplayName).ToList();
-        }
-
         public void OnConnect(string userId, string connectionId, string userAgent)
         {
             var user = _userContext.Users
@@ -86,7 +74,6 @@ namespace Database.Repositories
 
             _userContext.SaveChanges();
         }
-
         public void OnDisconnect(string userId, string userAgent)
         {
             throw new NotImplementedException();

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Database.Contexts;
-using Database.Models;
-using Database.Models.DTO;
+using DatabaseLayer.Contexts;
+using DatabaseLayer.Models;
+using DatabaseLayer.Models.DTO;
 using MediatR;
 using MidiatRHandlers.Chat.GetWithMessages;
 using MidiatRHandlers;
@@ -28,12 +28,12 @@ namespace TGBackend.Controllers
         public async Task<RequestResult<ChatDTO>> GetChatWithMessages(string chatId) => await _mediator.Send(new ChatWithMessagesQuery { ChatId = chatId });
 
         [HttpGet("list/{userId}")]
-        public async Task<RequestResult<IEnumerable<ChatListUnit>>> GetChatList(string userId) => await _mediator.Send(new ChatListQuery { UserId = userId });
+        public async Task<RequestResult<IEnumerable<ChatView>>> GetChatList(string userId) => await _mediator.Send(new ChatListQuery { UserId = userId });
 
         [HttpPost("add")]
         public async Task<RequestResult<string>> Create(ChatCreationQuery query) => await _mediator.Send(query);
 
         [HttpPost("delete")]
-        public async Task<RequestResult<string>> Delete(ChatDeletionQuery query) => await _mediator.Send(query);
+        public async Task<RequestResult> Delete(ChatDeletionQuery query) => await _mediator.Send(query);
     }
 }

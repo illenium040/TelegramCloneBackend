@@ -8,15 +8,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Database.Contexts;
-using Database.Models;
-using Database.Repositories;
+using DatabaseLayer.Contexts;
+using DatabaseLayer.Models;
+using DatabaseLayer.Repositories;
 using MediatR.Handlers.Login;
 using MediatR.JWT;
 using TGBackend.Hubs;
 using MidiatRHandlers.JWT;
 using TelegramCloneBackend;
 using DatabaseLayer.Repositories;
+using DatabaseLayer.Repositories.Base;
+using DatabaseLayer.Repositories.Base;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,8 +58,12 @@ builder.Services
     .AddSignInManager<SignInManager<User>>();
 
 builder.Services.AddScoped<PrivateChatRepository>()
-    .AddScoped<UserRepository>()
-    .AddScoped<UserChatRepository>();
+    .AddScoped<IUserRepository, UserRepository>()
+    .AddScoped<IUserChatRepository, UserChatRepository>()
+    .AddScoped<IChatRepository, PrivateChatRepository>()
+    .AddScoped<IMessagingRepository, UserChatRepository>()
+    .AddScoped<IConnectionRepository, UserRepository>();
+
 builder.Services.AddScoped<IJwtGenerator, DefaultJwtGenerator>();
 builder.Services.TryAddSingleton<ISystemClock, SystemClock>();
 

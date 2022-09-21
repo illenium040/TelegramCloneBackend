@@ -1,4 +1,4 @@
-﻿using Database.Models;
+﻿using DatabaseLayer.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace TelegramCloneBackend

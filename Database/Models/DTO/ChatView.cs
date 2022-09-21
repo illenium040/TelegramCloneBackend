@@ -1,6 +1,6 @@
-﻿namespace Database.Models.DTO
+﻿namespace DatabaseLayer.Models.DTO
 {
-    public class ChatListUnit
+    public class ChatView
     {
         public UserDTO User { get; set; }
         public string ChatId { get; set; }

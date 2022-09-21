@@ -1,4 +1,4 @@
-﻿using Database.Models.DTO;
+﻿using DatabaseLayer.Models.DTO;
 using MediatR;
 
 namespace MidiatRHandlers.Chat.Create

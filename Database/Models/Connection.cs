@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Database.Models
+namespace DatabaseLayer.Models
 {
     [Table("Connections")]
     public class Connection

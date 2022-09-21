@@ -1,4 +1,5 @@
-﻿using Database.Repositories;
+﻿using DatabaseLayer.Repositories;
+using DatabaseLayer.Repositories.Base;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,19 +9,25 @@ using System.Threading.Tasks;
 
 namespace MidiatRHandlers.Chat.Delete
 {
-    internal class ChatDeletionHandler : IRequestHandler<ChatDeletionQuery, RequestResult<string>>
+    internal class ChatDeletionHandler : IRequestHandler<ChatDeletionQuery, RequestResult>
     {
-        private readonly PrivateChatRepository _chatRepository;
-        private readonly UserRepository _userRepository;
-        public ChatDeletionHandler(PrivateChatRepository privateChat, UserRepository userRepository)
+        private readonly IUserChatRepository _userChatRepository;
+        public ChatDeletionHandler(IUserChatRepository userChatRepository)
         {
-            _userRepository = userRepository;
-            _chatRepository = privateChat;
+            _userChatRepository = userChatRepository;
         }
 
-        public Task<RequestResult<string>> Handle(ChatDeletionQuery request, CancellationToken cancellationToken)
+        public Task<RequestResult> Handle(ChatDeletionQuery request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _userChatRepository.RemoveChat(request.ChatId, request.UserId);
+                return Task.FromResult(RequestResult.OK());
+            }
+            catch(Exception e)
+            {
+                return Task.FromResult(RequestResult.BadRequest(new List<string> { e.Message }));
+            }
         }
     }
 }

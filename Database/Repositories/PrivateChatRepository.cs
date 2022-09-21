@@ -1,11 +1,11 @@
-﻿using Database.Contexts;
-using Database.Models;
+﻿using DatabaseLayer.Contexts;
+using DatabaseLayer.Models;
 using Microsoft.EntityFrameworkCore;
-using Database.Repositories.Base;
-using Database.Models.DTO;
+using DatabaseLayer.Repositories.Base;
+using DatabaseLayer.Models.DTO;
 using DatabaseLayer.Models;
 
-namespace Database.Repositories
+namespace DatabaseLayer.Repositories
 {
     public class PrivateChatRepository : IChatRepository
     {
@@ -14,7 +14,6 @@ namespace Database.Repositories
         {
             _chatContext = context;
         }
-
 
         public Message? GetLastMessageFromChat(string chatId)
         {
@@ -51,16 +50,15 @@ namespace Database.Repositories
                 .Count();
         }
 
-        public void ReadMessages(IEnumerable<string> messages, string chatId)
+        public void Add(Chat entity)
         {
-            var chat = _chatContext.Chats.
-                Include(x => x.Messages)
-                .FirstOrDefault(x => x.Id == chatId);
-            if (chat == null) return;
-            var selected = chat.Messages.IntersectBy(messages, x => x.Id);
-            foreach (var msg in selected)
-                msg.MessageState = MessageState.READ;
+            if(_chatContext.Chats.Find(entity.Id) == null)
+                _chatContext.Chats.Add(entity);
             _chatContext.SaveChanges();
         }
+
+        public Chat Get(string id) => _chatContext.Chats.Find(id);
+        public IEnumerable<Chat> GetAll() => _chatContext.Chats.AsNoTracking();
+        public void Save() => _chatContext.SaveChanges();
     }
 }

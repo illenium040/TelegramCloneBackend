@@ -1,13 +1,15 @@
-﻿using Database.Models.DTO;
-using Database.Repositories;
+﻿using DatabaseLayer.Models.DTO;
+using DatabaseLayer.Models.Extensions;
+using DatabaseLayer.Repositories;
+using DatabaseLayer.Repositories.Base;
 using MediatR;
 
 namespace MidiatRHandlers.Chat.GetWithMessages
 {
     public class ChatWithMessagesHandler : IRequestHandler<ChatWithMessagesQuery, RequestResult<ChatDTO>>
     {
-        private readonly PrivateChatRepository _chatRepository;
-        public ChatWithMessagesHandler(PrivateChatRepository chat)
+        private readonly IChatRepository _chatRepository;
+        public ChatWithMessagesHandler(IChatRepository chat)
         {
             _chatRepository = chat;
         }
@@ -27,16 +29,7 @@ namespace MidiatRHandlers.Chat.GetWithMessages
                 Data = new ChatDTO
                 {
                     Id = request.ChatId,
-                    Messages = messages.OrderBy(x => x.Created)
-                    .Select(x => new MessageDTO
-                    {
-                        Id = x.Id,
-                        Content = x.Content,
-                        Created = x.Created,
-                        UserIdFrom = x.FromUserId,
-                        ChatId = request.ChatId,
-                        State = x.MessageState
-                    }).ToList()
+                    Messages = messages.OrderBy(x => x.Created).Select(x => x.ToDTO()).ToList()
                 }
             };
         }

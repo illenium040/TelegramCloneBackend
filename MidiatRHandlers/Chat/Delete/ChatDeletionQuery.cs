@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MidiatRHandlers.Chat.Delete
 {
-    public class ChatDeletionQuery : IRequest<RequestResult<string>>
+    public class ChatDeletionQuery : IRequest<RequestResult>
     {
         public string UserId { get; set; }
         public string ChatId { get; set; }

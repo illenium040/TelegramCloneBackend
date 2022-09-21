@@ -1,4 +1,4 @@
-﻿using Database.Models;
+﻿using DatabaseLayer.Models;
 
 namespace MediatR.JWT
 {

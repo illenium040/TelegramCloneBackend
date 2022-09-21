@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using Database.Models.DTO;
+using DatabaseLayer.Models.DTO;
 using DatabaseLayer.Models;
 
-namespace Database.Models
+namespace DatabaseLayer.Models
 {
     [Table("Messages")]
     public class Message

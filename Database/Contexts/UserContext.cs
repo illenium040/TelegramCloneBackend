@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Database.Models;
+using DatabaseLayer.Models;
 using DatabaseLayer.Models;
 
-namespace Database.Contexts
+namespace DatabaseLayer.Contexts
 {
     public class UserContext : IdentityDbBase
     {

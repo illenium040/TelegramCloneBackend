@@ -5,9 +5,13 @@ using MediatR.Handlers.Login;
 using MediatR.Handlers.Models;
 using MidiatRHandlers.Register;
 using MidiatRHandlers;
-using Database.Repositories;
-using Database.Models;
-using Database.Models.DTO;
+using DatabaseLayer.Repositories;
+using DatabaseLayer.Models;
+using DatabaseLayer.Models.DTO;
+using DatabaseLayer.Repositories.Base;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using DatabaseLayer.Models.Extensions;
 
 namespace TGBackend.Controllers
 {
@@ -16,11 +20,29 @@ namespace TGBackend.Controllers
     public class UserController : ControllerBase
     {
         private IMediator _mediator;
-        private UserRepository _userRepository;
-        public UserController(IMediator mr, UserRepository userRepository)
+        private IUserRepository _userRepository;
+        public UserController(IMediator mr, IUserRepository userRepository)
         {
             _mediator = mr;
             _userRepository = userRepository;
+        }
+
+        [HttpPost("validate")]
+        public async Task<RequestResult> IsValid()
+        {
+            var jwt = (SecurityToken)HttpContext.Items["JWT"];
+            if (jwt == null) return RequestResult.NotAuthorize();
+            if (jwt.ValidTo <= DateTime.Now.AddMinutes(10)) return RequestResult.NotAuthorize();
+
+            var token = (JwtSecurityToken)jwt;
+            var id = token.Claims.First(x => x.Type == JwtRegisteredClaimNames.NameId).Value;
+            var name = token.Claims.First(x => x.Type == JwtRegisteredClaimNames.Name).Value;
+
+            var user = _userRepository.Get(id);
+            //what if name exists?
+
+            return user == null ? RequestResult.NotAuthorize() : RequestResult.OK();
+
         }
 
         [AllowAnonymous]
@@ -36,15 +58,9 @@ namespace TGBackend.Controllers
         {
             if (string.IsNullOrEmpty(userName)) return null;
             
-            var users = _userRepository.Seacrh(userName)
-            .Select(x => new UserDTO
-            {
-                Id = x.Id,
-                Name = x.DisplayName,
-                LoginName = x.UserName,
-                Email = x.Email,
-                Avatar = x.Avatar
-            }).ToList();
+            var users = _userRepository
+                .Seacrh(userName)
+                .Select(x => x.ToDTO()).ToList();
             return new RequestResult<IEnumerable<UserDTO>>
             {
                 Data = users,
@@ -56,10 +72,7 @@ namespace TGBackend.Controllers
 #if DEBUG
         [AllowAnonymous]
         [HttpGet]
-        public IEnumerable<User> GetAllUsers()
-        {
-            return _userRepository.GetUsers();
-        }
+        public IEnumerable<User> GetAllUsers() => _userRepository.GetAll();
 #endif
 
     }

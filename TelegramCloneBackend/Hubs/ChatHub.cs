@@ -1,44 +1,60 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Database.Models.DTO;
-using Database.Repositories;
+using DatabaseLayer.Models.DTO;
 using DatabaseLayer.Repositories;
+using DatabaseLayer.Repositories.Base;
+using DatabaseLayer.Models;
 
 namespace TGBackend.Hubs
 {
     public class ChatHub : Hub
     {
-        private PrivateChatRepository _chatRepository;
-        private UserRepository _userRepository;
-        private UserChatRepository _userChatRepository;
-        public ChatHub(PrivateChatRepository chatRepository, UserRepository userRepository, UserChatRepository userChat)
+        private IConnectionRepository _connectionRepository;
+        private IMessagingRepository _messagingRepository;
+        private IChatRepository _chatRepository;
+        public ChatHub(IMessagingRepository messagingRepository, 
+            IConnectionRepository connectionRepository , 
+            IChatRepository chatRepository)
         {
+            _connectionRepository = connectionRepository;
+            _messagingRepository = messagingRepository;
             _chatRepository = chatRepository;
-            _userRepository = userRepository;
-            _userChatRepository = userChat;
         }
 
         public async Task ReadMessage(IEnumerable<string> messageIds, string chatId, string targetUserId)
         {
-            var connections = _userRepository.GetUserConnections(targetUserId);
-            _chatRepository.ReadMessages(messageIds, chatId);
+            var connections = _connectionRepository.GetUserConnections(targetUserId);
+            _messagingRepository.ReadMessages(messageIds, chatId);
             await Clients.Clients(connections.Select(x => x.ConnectionID)).SendAsync("ReadMessage", messageIds, chatId, targetUserId);
             await Clients.Caller.SendAsync("ReadMessage", messageIds, chatId, targetUserId);
         }
 
         public async Task SendMessage(MessageDTO data)
         {
-            var userToConnections = _userRepository.GetUserConnections(data.UserIdTo);
-            var sendedMsg = _userChatRepository.SendMessage(data);
+            var userToConnections = _connectionRepository.GetUserConnections(data.UserIdTo);
+            var sendedMsg = _messagingRepository.SendMessage(data, out ChatView reciever);
             data.Created = sendedMsg.Created;
-            await Clients.Clients(userToConnections.Select(x => x.ConnectionID)).SendAsync("ReceiveMessage", data);
-            var msg = _userChatRepository.SendToUser(data);
+            if(reciever != null)
+                await Clients.Clients(userToConnections.Select(x => x.ConnectionID))
+                    .SendAsync("ReceiveMessage", data, reciever);
+            else await Clients.Clients(userToConnections.Select(x => x.ConnectionID))
+                .SendAsync("ReceiveMessage", data);
+            var msg = _messagingRepository.SendToUser(data);
             data.State = msg.MessageState;
             await Clients.Caller.SendAsync("ReceiveMessage", data);
-            
         }
+
+        public async Task AddToChatList(ChatView chatUnit)
+        {
+            await Clients.Caller.SendAsync("AddToChatList", chatUnit);
+        }
+        public async Task DeleteFromChatList(ChatView chatUnit)
+        {
+            await Clients.Caller.SendAsync("DeleteFromChatList", chatUnit);
+        }
+
         public void SetUserHub(string userId)
         {
-            _userRepository.OnConnect(userId, Context.ConnectionId,
+            _connectionRepository.OnConnect(userId, Context.ConnectionId,
                 Context.GetHttpContext().Request.Headers["User-Agent"]);
         }
     }

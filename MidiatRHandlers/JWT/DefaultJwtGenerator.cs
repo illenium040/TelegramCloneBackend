@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Database.Models;
+using DatabaseLayer.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 
@@ -20,7 +20,10 @@ namespace MediatR.JWT
 
 		public string CreateToken(User user)
 		{
-			var claims = new List<Claim> { new Claim(JwtRegisteredClaimNames.NameId, user.UserName) };
+			var claims = new List<Claim> { 
+				new Claim(JwtRegisteredClaimNames.Name, user.UserName),
+				new Claim(JwtRegisteredClaimNames.NameId, user.Id)
+			};
 
 			var credentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
 

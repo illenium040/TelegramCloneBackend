@@ -1,5 +1,5 @@
-﻿using Database.Models;
-using Database.Repositories;
+﻿using DatabaseLayer.Models;
+using DatabaseLayer.Repositories;
 using MediatR;
 using MediatR.Handlers.Models;
 using Microsoft.AspNetCore.Identity;

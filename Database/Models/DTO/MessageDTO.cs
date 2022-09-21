@@ -1,4 +1,4 @@
-﻿namespace Database.Models.DTO
+﻿namespace DatabaseLayer.Models.DTO
 {
     public class MessageDTO
     {

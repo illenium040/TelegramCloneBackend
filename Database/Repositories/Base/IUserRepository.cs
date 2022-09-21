@@ -1,16 +1,13 @@
 ﻿using System.Collections;
-using Database.Models;
 using DatabaseLayer.Models;
+using DatabaseLayer.Repositories.Base;
 
-namespace Database.Repositories.Base
+namespace DatabaseLayer.Repositories.Base
 {
-    public interface IUserRepository
+    public interface IUserRepository : IRepository<User>
     {
-        void Add(User user);
-        User Get(string id);
-        User GetByName(string name);
-        IEnumerable<User> GetUsers();
-        IEnumerable<Connection> GetUserConnections(string id);
+        User? GetByName(string name);
         IEnumerable<User> Seacrh(string name);
+        
     }
 }

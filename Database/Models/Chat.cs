@@ -1,4 +1,4 @@
-﻿using Database.Models;
+﻿using DatabaseLayer.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

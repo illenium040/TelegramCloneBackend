@@ -1,4 +1,4 @@
-﻿using Database.Models;
+﻿using DatabaseLayer.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -16,5 +16,6 @@ namespace DatabaseLayer.Models
         public User User { get; set; }
         public string ChatId { get; set; }
         public Chat Chat { get; set; }
+        public string TargetUserId { get; set; }
     }
 }

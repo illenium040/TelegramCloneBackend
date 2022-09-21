@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Database.Models
+namespace DatabaseLayer.Models
 {
     [Table("AspNetUsers")]
     public class User : IdentityUser

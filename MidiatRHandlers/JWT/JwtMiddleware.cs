@@ -45,11 +45,7 @@ namespace MidiatRHandlers.JWT
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 
-                var jwtToken = (JwtSecurityToken)validatedToken;
-                var name = jwtToken.Claims.First(x => x.Type == JwtRegisteredClaimNames.NameId).Value;
-
-                // attach account to context on successful jwt validation
-                context.Items["JWTUserName"] = name;
+                context.Items["JWT"] = validatedToken;
             }
             catch
             {

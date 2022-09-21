@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Rest;
 using System.Net;
-using Database.Models;
+using DatabaseLayer.Models;
 using MediatR.JWT;
 using MediatR.Handlers.Models;
 using MidiatRHandlers;
