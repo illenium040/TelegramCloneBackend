@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using DatabaseLayer.Models;
-using DatabaseLayer.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace DatabaseLayer.Contexts
@@ -30,6 +29,7 @@ namespace DatabaseLayer.Contexts
             {
                 e.HasKey(x => x.Id);
                 e.HasMany(x => x.Chats).WithOne(x => x.User).HasForeignKey(x => x.UserId);
+                e.HasMany(x => x.Folders).WithOne(x => x.User).HasForeignKey(x => x.UserId);
             });
 
             modelBuilder.Entity<ChatToUser>(e =>
@@ -38,8 +38,13 @@ namespace DatabaseLayer.Contexts
                 e.Property(x => x.Id).UseSerialColumn().ValueGeneratedOnAdd();
                 e.HasOne(x => x.User).WithMany(x => x.Chats).HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
                 e.HasOne(x => x.Chat).WithMany(x => x.Users).HasForeignKey(x => x.ChatId).OnDelete(DeleteBehavior.Cascade);
+                e.HasMany(x => x.Folders).WithMany(x => x.ChatToUser);
             });
-
+            modelBuilder.Entity<Folder>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.HasOne(x => x.User).WithMany(x => x.Folders).HasForeignKey(x => x.UserId);
+            });
             modelBuilder.Entity<Connection>(e =>
             {
                 e.HasKey(x => x.Id);

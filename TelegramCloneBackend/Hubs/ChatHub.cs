@@ -34,24 +34,13 @@ namespace TGBackend.Hubs
             var sendedMsg = _messagingRepository.SendMessage(data, out ChatView reciever);
             data.Created = sendedMsg.Created;
             if(reciever != null)
-                await Clients.Clients(userToConnections.Select(x => x.ConnectionID))
-                    .SendAsync("ReceiveMessage", data, reciever);
+                await Clients.Clients(userToConnections.Select(x => x.ConnectionID)).SendAsync("ReceiveMessage", data, reciever);
             else await Clients.Clients(userToConnections.Select(x => x.ConnectionID))
                 .SendAsync("ReceiveMessage", data);
             var msg = _messagingRepository.SendToUser(data);
             data.State = msg.MessageState;
-            await Clients.Caller.SendAsync("ReceiveMessage", data);
+            await Clients.Caller.SendAsync("ReceiveMessage", data, reciever);
         }
-
-        public async Task AddToChatList(ChatView chatUnit)
-        {
-            await Clients.Caller.SendAsync("AddToChatList", chatUnit);
-        }
-        public async Task DeleteFromChatList(ChatView chatUnit)
-        {
-            await Clients.Caller.SendAsync("DeleteFromChatList", chatUnit);
-        }
-
         public void SetUserHub(string userId)
         {
             _connectionRepository.OnConnect(userId, Context.ConnectionId,

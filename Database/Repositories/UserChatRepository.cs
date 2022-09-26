@@ -65,15 +65,15 @@ namespace DatabaseLayer.Repositories
             return chat.Id;
         }
 
-        public IEnumerable<Chat> GetUserChatList(string userId)
+        public IEnumerable<ChatToUser> GetUserChatList(string userId)
         {
             var chats = _userContext.ChatsToUsers
                 .Include(x => x.Chat)
                     .ThenInclude(x => x.Users)
                     .ThenInclude(x => x.User)
-                .Where(x => x.UserId == userId)
-                .Select(x => x.Chat);
-            return chats ?? Enumerable.Empty<Chat>();
+                    .ThenInclude(x => x.Folders)
+                .Where(x => x.UserId == userId);
+            return chats ?? Enumerable.Empty<ChatToUser>();
         }
 
         public Message SendToUser(MessageDTO message)
@@ -98,12 +98,13 @@ namespace DatabaseLayer.Repositories
             if (!chatUsers.Contains(message.UserIdFrom))
             {
                 AddUserToChat(message.ChatId, message.UserIdFrom);
-                targetUser = _manager.Users.SingleOrDefault(x => x.Id == message.UserIdTo);
+                targetUser = _manager.Users.Include(x => x.Chats).SingleOrDefault(x => x.Id == message.UserIdTo);
             }
             if (!chatUsers.Contains(message.UserIdTo))
             {
                 AddUserToChat(message.ChatId, message.UserIdTo);
-                targetUser = _manager.Users.SingleOrDefault(x => x.Id == message.UserIdFrom);
+                targetUser = _manager.Users.Include(x => x.Chats)
+                    .SingleOrDefault(x => x.Id == message.UserIdFrom);
             }
 
             var msg = new Message
@@ -111,10 +112,10 @@ namespace DatabaseLayer.Repositories
                 ChatId = message.ChatId,
                 Content = message.Content,
                 Created = DateTime.UtcNow,
-                FromUserId = message.UserIdFrom,
+                Sender = message.UserIdFrom,
                 Id = message.Id ?? Guid.NewGuid().ToString(),
                 ContentType = message.ContentType,
-                ToUserId = message.UserIdTo,
+                Receiver = message.UserIdTo,
                 MessageState = MessageState.SENDED_TO_SERVER
             };
             chat.Messages.Add(msg);
@@ -126,7 +127,9 @@ namespace DatabaseLayer.Repositories
                 {
                     ChatId = message.ChatId,
                     LastMessage = msg.ToDTO(),
+                    UnreadMessagesCount = 0,
                     User = targetUser.ToDTO(),
+                    ChatToUser = targetUser.Chats.SingleOrDefault(x => x.ChatId == message.ChatId)?.ToDTO()
                 };
             }
 
@@ -159,6 +162,61 @@ namespace DatabaseLayer.Repositories
             _userContext.ChatsToUsers.Remove(ctu);
             _userContext.SaveChanges();
             
+        }
+
+        private ChatToUser GetSingleChatUser(string chatId, string userId) =>
+            _userContext.ChatsToUsers.SingleOrDefault(x => x.UserId == userId && x.ChatId == chatId);
+
+        public bool ArchiveChat(string chatId, string userId)
+        {
+            var chat = GetSingleChatUser(chatId, userId);
+            chat.IsArchived = !chat.IsArchived;
+            _userContext.SaveChanges();
+            return chat.IsArchived;
+        }
+
+        public bool TogglePin(string chatId, string userId)
+        {
+            var chat = GetSingleChatUser(chatId, userId);
+            chat.IsPinned = !chat.IsPinned;
+            _userContext.SaveChanges();
+            return chat.IsPinned;
+        }
+
+        public bool ToggleNotifications(string chatId, string userId)
+        {
+            var chat = GetSingleChatUser(chatId, userId);
+            chat.IsNotified = !chat.IsNotified;
+            _userContext.SaveChanges();
+            return chat.IsNotified;
+        }
+
+        public void AddToFolder(string folderId, string chatId, string userId)
+        {
+            var chat = _userContext.ChatsToUsers
+                .Include(x => x.Folders)
+                .ThenInclude(x => x.ChatToUser)
+                .SingleOrDefault(x => x.UserId == userId && x.ChatId == chatId);
+            chat.Folders.SingleOrDefault(x => x.Id == folderId)?.ChatToUser.Add(chat);
+            _userContext.SaveChanges();
+        }
+
+        public void RemoveFromFolder(string folderId, string chatId, string userId)
+        {
+            var chat = _userContext.ChatsToUsers
+                .Include(x => x.Folders)
+                .ThenInclude(x => x.ChatToUser)
+                .SingleOrDefault(x => x.UserId == userId && x.ChatId == chatId);
+            chat.Folders.SingleOrDefault(x => x.Id == folderId)?.ChatToUser.Remove(chat);
+            _userContext.SaveChanges();
+        }
+
+        public bool BlockChat(string chatId, string userId)
+        {
+            var chat = GetSingleChatUser(chatId, userId);
+            chat.IsBlocked = !chat.IsNotified;
+            _userContext.SaveChanges();
+            return chat.IsBlocked;
         }
     }
 }

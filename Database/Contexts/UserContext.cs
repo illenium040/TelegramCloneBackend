@@ -10,5 +10,6 @@ namespace DatabaseLayer.Contexts
         public DbSet<User> Users { get; set; }
         public DbSet<Connection> Connections { get; set; }
         public DbSet<ChatToUser> ChatsToUsers { get; set; }
+        public DbSet<Folder> Folders { get; set; }
     }
 }

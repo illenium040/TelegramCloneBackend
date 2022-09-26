@@ -11,6 +11,7 @@ namespace DatabaseLayer.Models
         public string? Avatar { get; set; }
         public ICollection<ChatToUser> Chats { get; set; } = new List<ChatToUser>();
         public ICollection<Connection> Connections { get; set; } = new List<Connection>();
+        public ICollection<Folder> Folders { get; set; } = new List<Folder>();
 
     }
 }

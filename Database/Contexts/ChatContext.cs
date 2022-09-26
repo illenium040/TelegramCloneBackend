@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using DatabaseLayer.Models;
-using DatabaseLayer.Models;
 
 namespace DatabaseLayer.Contexts
 {

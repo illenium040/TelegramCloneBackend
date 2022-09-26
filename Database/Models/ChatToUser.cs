@@ -17,5 +17,11 @@ namespace DatabaseLayer.Models
         public string ChatId { get; set; }
         public Chat Chat { get; set; }
         public string TargetUserId { get; set; }
+        public bool IsPrivate { get; set; } = true;
+        public bool IsArchived { get; set; } = false;
+        public bool IsNotified { get; set; } = true;
+        public bool IsPinned { get; set; } = false;
+        public bool IsBlocked { get; set; } = false;
+        public ICollection<Folder> Folders { get; set; } = new List<Folder>();
     }
 }

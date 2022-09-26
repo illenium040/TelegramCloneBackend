@@ -6,8 +6,8 @@
         public string UserIdTo { get; set; }
         public string ChatId { get; set; }
         public string UserIdFrom { get; set; }
-        public string Content { get; set; }
         public DateTime? Created { get; set; }
+        public string Content { get; set; }
         public MessageContentType ContentType { get; set; }
         public MessageState? State { get; set; }
     }

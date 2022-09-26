@@ -21,8 +21,27 @@ namespace DatabaseLayer.Models.Extensions
             Created = message.Created,
             Id = message.Id,
             State = message.MessageState,
-            UserIdFrom = message.FromUserId,
-            UserIdTo = message.ToUserId
+            UserIdFrom = message.Sender,
+            UserIdTo = message.Receiver
+        };
+
+        public static ChatToUserDTO ToDTO(this ChatToUser chatToUser) => new ChatToUserDTO
+        {
+            Id = chatToUser.Id,
+            ChatId = chatToUser.ChatId,
+            UserId = chatToUser.UserId,
+            TargetUserId = chatToUser.TargetUserId,
+            IsArchived = chatToUser.IsArchived,
+            IsBlocked = chatToUser.IsBlocked,
+            IsNotified = chatToUser.IsNotified,
+            IsPinned = chatToUser.IsPinned,
+            IsPrivate = chatToUser.IsPrivate,
+            Folders = chatToUser.Folders.Select(x => new FolderDTO 
+            { 
+                Id = x.Id,
+                Icon = x.Icon,
+                Name = x.Name
+            })
         };
     }
 }

@@ -31,7 +31,7 @@ namespace MidiatRHandlers.Chat.GetChatList
                 Status = System.Net.HttpStatusCode.OK,
                 Succeeded = true
             };
-            var units = GetUnits(chatList, request.UserId).ToList();
+            var units = GetUnits(chatList).ToList();
             return new RequestResult<IEnumerable<ChatView>>
             {
                 Data = units,
@@ -40,22 +40,21 @@ namespace MidiatRHandlers.Chat.GetChatList
             };
         }
 
-        private IEnumerable<ChatView> GetUnits(IEnumerable<DatabaseLayer.Models.Chat> chatList, string userId)
+        private IEnumerable<ChatView> GetUnits(IEnumerable<ChatToUser> chatList)
         {
             foreach (var chat in chatList)
             {
-                var lm = _chatRepository.GetLastMessageFromChat(chat.Id);
-                var msc = _chatRepository.GetUnreadMessagesCount(chat.Id, userId);
-                var userChat = chat.Users.SingleOrDefault(x => x.UserId != userId);
-                var me = chat.Users.Single(x => x.UserId == userId);
-                var user = userChat?.User ?? _userRepository.Get(me.TargetUserId);
+                var lm = _chatRepository.GetLastMessageFromChat(chat.ChatId);
+                var msc = _chatRepository.GetUnreadMessagesCount(chat.ChatId, chat.UserId);
+                var userChat = _userRepository.Get(chat.TargetUserId);
                 var chatListUnit = new ChatView
                 {
-                    ChatId = chat.Id,
+                    ChatId = chat.ChatId,
                     UnreadMessagesCount = msc,
-                    User = user.ToDTO()
+                    User = userChat.ToDTO(),
+                    ChatToUser = chat.ToDTO(),
+                    LastMessage = lm is null ? null : lm.ToDTO()
                 };
-                if (lm != null) chatListUnit.LastMessage = lm.ToDTO();
                 yield return chatListUnit;
             }
         }

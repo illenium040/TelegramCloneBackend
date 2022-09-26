@@ -6,5 +6,6 @@
         public string ChatId { get; set; }
         public int? UnreadMessagesCount { get; set; }
         public MessageDTO? LastMessage { get; set; }
+        public ChatToUserDTO ChatToUser { get; set; }
     }
 }

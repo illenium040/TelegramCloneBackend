@@ -19,8 +19,8 @@ namespace TGBackend.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private IMediator _mediator;
-        private IUserRepository _userRepository;
+        private readonly IMediator _mediator;
+        private readonly IUserRepository _userRepository;
         public UserController(IMediator mr, IUserRepository userRepository)
         {
             _mediator = mr;

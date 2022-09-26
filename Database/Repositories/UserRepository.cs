@@ -21,12 +21,14 @@ namespace DatabaseLayer.Repositories
 
         public IEnumerable<User> Seacrh(string name)
         {
+            var search = name.ToLower();
             if (name[0] == '@')
                 return _userContext.Users
-                        .Where(x => EF.Functions.Like(x.UserName, $"%{name.Substring(1)}%"))
+                        .Where(x => EF.Functions.Like(x.UserName.ToLower(), $"%{search.Substring(1)}%"))
                         .AsEnumerable();
             return _userContext.Users
-                .Where(x => EF.Functions.Like(x.DisplayName, $"%{name}%"))
+                .Include(x => x.Chats)
+                .Where(x => EF.Functions.Like(x.DisplayName.ToLower(), $"%{search}%"))
                 .AsEnumerable();
         }
 
@@ -37,8 +39,6 @@ namespace DatabaseLayer.Repositories
         public IEnumerable<User> GetAll() => _userContext.Users.AsNoTracking().ToList();
         public void Save() => _userContext.SaveChanges();
         public IEnumerable<User> GetUsers() => _userContext.Users.OrderBy(x => x.DisplayName).ToList();
-
-
 
         public IEnumerable<Connection> GetUserConnections(string id)
         {
@@ -77,6 +77,12 @@ namespace DatabaseLayer.Repositories
         public void OnDisconnect(string userId, string userAgent)
         {
             throw new NotImplementedException();
+        }
+
+        public void AddFolder(Folder folder)
+        {
+            _userContext.Folders.Add(folder);
+            _userContext.SaveChanges();
         }
     }
 }

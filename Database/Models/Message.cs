@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using DatabaseLayer.Models.DTO;
-using DatabaseLayer.Models;
 
 namespace DatabaseLayer.Models
 {
@@ -10,8 +8,8 @@ namespace DatabaseLayer.Models
         public string ChatId { get; set; }
         public Chat Chat { get; set; }
         public string Id { get; set; }
-        public string FromUserId { get; set; }
-        public string ToUserId { get; set; }
+        public string Sender { get; set; }
+        public string Receiver { get; set; }
         public string Content { get; set; }
         public MessageContentType ContentType { get; set; }
         public MessageState MessageState { get; set; }
@@ -33,6 +31,7 @@ namespace DatabaseLayer.Models
         Text = 1,
         Video = 2,
         Audio = 4,
-        Image = 8
+        Image = 8,
+        Link = 16,
     }
 }

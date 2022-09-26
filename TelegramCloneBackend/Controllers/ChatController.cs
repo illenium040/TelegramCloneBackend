@@ -9,6 +9,7 @@ using MidiatRHandlers.Chat.GetChatList;
 using MidiatRHandlers.Chat.Create;
 using Microsoft.AspNetCore.Authorization;
 using MidiatRHandlers.Chat.Delete;
+using DatabaseLayer.Repositories.Base;
 
 namespace TGBackend.Controllers
 {
@@ -18,9 +19,11 @@ namespace TGBackend.Controllers
     public class ChatController : ControllerBase
     {
         private readonly IMediator _mediator;
-        public ChatController(IMediator mediator)
+        private readonly IUserChatRepository _userChat;
+        public ChatController(IMediator mediator, IUserChatRepository userChat)
         {
             _mediator = mediator;
+            _userChat = userChat;
         }
 
 
@@ -35,5 +38,46 @@ namespace TGBackend.Controllers
 
         [HttpPost("delete")]
         public async Task<RequestResult> Delete(ChatDeletionQuery query) => await _mediator.Send(query);
+
+        [HttpPost("archive")]
+        public async Task<RequestResult> Archive([FromQuery] string userId, [FromQuery] string chatId)
+        {
+            return new RequestResult<bool>
+            {
+                Data = _userChat.ArchiveChat(chatId, userId),
+                Status = System.Net.HttpStatusCode.OK,
+                Succeeded = true
+            };
+        }
+        [HttpPost("togglePin")]
+        public async Task<RequestResult> TogglePin([FromQuery] string userId, [FromQuery] string chatId)
+        {
+            return new RequestResult<bool>
+            {
+                Data = _userChat.TogglePin(chatId, userId),
+                Status = System.Net.HttpStatusCode.OK,
+                Succeeded = true
+            };
+        }
+        [HttpPost("toggleNotifications")]
+        public async Task<RequestResult> ToggleNotifications([FromQuery] string userId, [FromQuery] string chatId)
+        {
+            return new RequestResult<bool>
+            {
+                Data = _userChat.ToggleNotifications(chatId, userId),
+                Status = System.Net.HttpStatusCode.OK,
+                Succeeded = true
+            };
+        }
+        [HttpPost("block")]
+        public async Task<RequestResult> Block([FromQuery] string userId, [FromQuery] string chatId)
+        {
+            return new RequestResult<bool>
+            {
+                Data = _userChat.BlockChat(chatId, userId),
+                Status = System.Net.HttpStatusCode.OK,
+                Succeeded = true
+            };
+        }
     }
 }

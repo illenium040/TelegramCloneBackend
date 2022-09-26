@@ -8,6 +8,6 @@ namespace DatabaseLayer.Repositories.Base
     {
         User? GetByName(string name);
         IEnumerable<User> Seacrh(string name);
-        
+        void AddFolder(Folder folder);
     }
 }

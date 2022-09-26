@@ -38,7 +38,7 @@ namespace DatabaseLayer.Repositories
                 .Include(x => x.Chat)
                 .Where(x => x.Chat.Id == chatId && 
                     x.MessageState == MessageState.SENDED_TO_USER &&
-                    x.FromUserId != userId)
+                    x.Sender != userId)
                 .Count();
         }
 
