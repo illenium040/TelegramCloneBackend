@@ -32,7 +32,7 @@ builder.Services.AddCors(o => {
         builder
         .AllowAnyOrigin()
         .AllowAnyMethod()
-        .AllowAnyHeader()
+        .AllowAnyHeader();
     });
 });
 #if DEBUG
