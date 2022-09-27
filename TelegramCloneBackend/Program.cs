@@ -33,7 +33,7 @@ builder.Services.AddCors(o => {
         .SetIsOriginAllowed(origin =>
         {
             var host = new Uri(origin).Host;
-            return host == "localhost" || host == "tgbackend.onrender.com";
+            return host == "localhost";
         })
         .AllowAnyMethod()
         .AllowAnyHeader()
