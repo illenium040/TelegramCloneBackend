@@ -22,20 +22,29 @@ using EasyCaching.InMemory;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddJsonFile("appsettings.json");
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
 builder.Services.AddCors(o => {
     o.AddDefaultPolicy(builder =>
     {
         builder
-        .SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
+        .SetIsOriginAllowed(origin =>
+        {
+            var host = new Uri(origin).Host;
+            return host == "localhost" || host == "tgbackend.onrender.com";
+        })
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials();
     });
 });
+#if DEBUG
 var connectionString = "Host=localhost;Port=5432;Database=Telegram;Username=postgres;Password=20612061";
-var cs = "Host=jelani.db.elephantsql.com;Port=5432;Database=qwavknxl;Username=qwavknxl;Password=SbbhWZDROnUwynAJCubber-cr_F1rXVb;sslmode=Require;TrustServerCertificate=true;Maximum Pool Size=5";
+#else
+var connectionString = "Host=jelani.db.elephantsql.com;Port=5432;Database=qwavknxl;Username=qwavknxl;Password=SbbhWZDROnUwynAJCubber-cr_F1rXVb;sslmode=Require;TrustServerCertificate=true;Maximum Pool Size=5";
+#endif
 builder.Services.AddEntityFrameworkNpgsql()
                 .AddDbContext<ChatContext>(options => { options.UseNpgsql(connectionString); })
                 .AddDbContext<UserContext>(options => { options.UseNpgsql(connectionString); });
