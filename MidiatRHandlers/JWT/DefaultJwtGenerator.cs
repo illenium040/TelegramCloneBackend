@@ -12,10 +12,14 @@ namespace MediatR.JWT
     public class DefaultJwtGenerator : IJwtGenerator
 	{
 		private readonly SymmetricSecurityKey _key;
-
 		public DefaultJwtGenerator(IConfiguration config)
 		{
-			_key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]));
+#if DEBUG
+			var token = config["TokenKey"];
+#else
+var token = config["TokenKeyServer"];
+#endif
+			_key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(token));
 		}
 
 		public string CreateToken(User user)

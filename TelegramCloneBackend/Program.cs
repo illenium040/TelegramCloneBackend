@@ -23,6 +23,10 @@ using EasyCaching.InMemory;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.json");
+#if !DEBUG
+builder.Configuration.AddKeyPerFile(directoryPath: "/etc/secrets", optional: true);
+#endif
+
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
@@ -38,7 +42,7 @@ builder.Services.AddCors(o => {
 #if DEBUG
 var connectionString = "Host=localhost;Port=5432;Database=Telegram;Username=postgres;Password=20612061";
 #else
-var connectionString = "Host=jelani.db.elephantsql.com;Port=5432;Database=qwavknxl;Username=qwavknxl;Password=SbbhWZDROnUwynAJCubber-cr_F1rXVb;sslmode=Require;TrustServerCertificate=true;Maximum Pool Size=5";
+var connectionString = builder.Configuration["ConnectionStringServer"];
 #endif
 builder.Services.AddEntityFrameworkNpgsql()
                 .AddDbContext<ChatContext>(options => { options.UseNpgsql(connectionString); })
@@ -72,7 +76,13 @@ builder.Services.AddScoped<PrivateChatRepository>()
 builder.Services.AddScoped<IJwtGenerator, DefaultJwtGenerator>();
 builder.Services.TryAddSingleton<ISystemClock, SystemClock>();
 
-var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["TokenKey"]));
+#if DEBUG
+var token = builder.Configuration["TokenKey"];
+#else
+var token = builder.Configuration["TokenKeyServer"];
+#endif
+var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(token));
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(

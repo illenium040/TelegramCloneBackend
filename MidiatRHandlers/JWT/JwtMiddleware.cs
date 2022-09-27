@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CQRSLayer.JWT
 {
@@ -16,8 +12,13 @@ namespace CQRSLayer.JWT
         private readonly RequestDelegate _next;
         public JwtMiddleware(RequestDelegate next, IConfiguration config)
         {
+#if DEBUG
+            var token = config["TokenKey"];
+#else
+var token = config["TokenKeyServer"];
+#endif
             _next = next;
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]));
+            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(token));
         }
 
         public async Task Invoke(HttpContext context)
