@@ -33,6 +33,7 @@ builder.Services.AddCors(o => {
         .SetIsOriginAllowed(origin =>
         {
             var host = new Uri(origin).Host;
+            Console.WriteLine(host);
             return host == "localhost";
         })
         .AllowAnyMethod()
