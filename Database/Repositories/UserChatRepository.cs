@@ -98,13 +98,13 @@ namespace DatabaseLayer.Repositories
             if (!chatUsers.Contains(message.UserIdFrom))
             {
                 AddUserToChat(message.ChatId, message.UserIdFrom);
-                targetUser = _manager.Users.Include(x => x.Chats).SingleOrDefault(x => x.Id == message.UserIdTo);
+                targetUser = _manager.Users.Include(x => x.Chats).SingleOrDefault(x => x.Id == message.UserIdFrom);
             }
             if (!chatUsers.Contains(message.UserIdTo))
             {
                 AddUserToChat(message.ChatId, message.UserIdTo);
                 targetUser = _manager.Users.Include(x => x.Chats)
-                    .SingleOrDefault(x => x.Id == message.UserIdFrom);
+                    .SingleOrDefault(x => x.Id == message.UserIdTo);
             }
 
             var msg = new Message
