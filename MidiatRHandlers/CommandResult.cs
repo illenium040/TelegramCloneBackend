@@ -5,17 +5,17 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MidiatRHandlers
+namespace CQRSLayer
 {
-    public class RequestResult
+    public class CommandResult
     {
         public bool Succeeded { get; set; } = false;
         public IEnumerable<string> Errors { get; set; }
         public HttpStatusCode? Status { get; set; }
 
-        public static RequestResult BadRequest(IEnumerable<string> errors = null)
+        public static CommandResult BadRequest(IEnumerable<string> errors = null)
         {
-            return new RequestResult
+            return new CommandResult
             {
                 Errors = errors,
                 Succeeded = false,
@@ -23,9 +23,9 @@ namespace MidiatRHandlers
             };
         }
 
-        public static RequestResult NotAuthorize(IEnumerable<string> errors = null)
+        public static CommandResult NotAuthorize(IEnumerable<string> errors = null)
         {
-            return new RequestResult
+            return new CommandResult
             {
                 Errors = errors,
                 Succeeded = false,
@@ -33,9 +33,9 @@ namespace MidiatRHandlers
             };
         }
 
-        public static RequestResult OK()
+        public static CommandResult OK()
         {
-            return new RequestResult
+            return new CommandResult
             {
                 Succeeded = true,
                 Status = HttpStatusCode.OK
@@ -43,8 +43,9 @@ namespace MidiatRHandlers
         }
     }
 
-    public class RequestResult<T> : RequestResult
+    public class CommandResult<T>
     {
         public T Data { get; set; }
+        public CommandResult Result { get; set; }
     }
 }

@@ -1,20 +1,16 @@
 ﻿using DatabaseLayer.Models;
 using DatabaseLayer.Models.DTO;
-using DatabaseLayer.Repositories;
-using DatabaseLayer.Models;
-using DatabaseLayer.Repositories;
-using MediatR;
 using DatabaseLayer.Repositories.Base;
 using DatabaseLayer.Models.Extensions;
 
-namespace MidiatRHandlers.Chat.GetChatList
+namespace CQRSLayer.Chat.GetChatList
 {
-    internal class ChatListHandler : IRequestHandler<ChatListQuery, RequestResult<IEnumerable<ChatView>>>
+    internal class GetChatListHandler : ICommandHandler<GetChatListCommand, IEnumerable<ChatView>>
     {
         private readonly IChatRepository _chatRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUserChatRepository _userChatRepository;
-        public ChatListHandler(IChatRepository chatRepository, 
+        public GetChatListHandler(IChatRepository chatRepository, 
             IUserRepository repository, 
             IUserChatRepository userChatRepository)
         {
@@ -22,21 +18,19 @@ namespace MidiatRHandlers.Chat.GetChatList
             _userRepository = repository;
             _userChatRepository = userChatRepository;
         }
-        public async Task<RequestResult<IEnumerable<ChatView>>> Handle(ChatListQuery request, CancellationToken cancellationToken)
+        public async Task<CommandResult<IEnumerable<ChatView>>> Handle(GetChatListCommand request, CancellationToken cancellationToken)
         {
             var chatList = _userChatRepository.GetUserChatList(request.UserId).ToList();
-            if (!chatList.Any()) return new RequestResult<IEnumerable<ChatView>>
+            if (!chatList.Any()) return new CommandResult<IEnumerable<ChatView>>
             {
                 Data = Enumerable.Empty<ChatView>(),
-                Status = System.Net.HttpStatusCode.OK,
-                Succeeded = true
+                Result = CommandResult.BadRequest(new List<string> { "User has no chats" })
             };
             var units = GetUnits(chatList).ToList();
-            return new RequestResult<IEnumerable<ChatView>>
+            return new CommandResult<IEnumerable<ChatView>>
             {
                 Data = units,
-                Status = System.Net.HttpStatusCode.OK,
-                Succeeded = true
+                Result = CommandResult.OK()
             };
         }
 

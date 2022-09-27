@@ -1,35 +1,43 @@
 ﻿using DatabaseLayer.Models;
 using DatabaseLayer.Repositories;
+using DatabaseLayer.Repositories.Base;
 using MediatR;
 using MediatR.Handlers.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace MidiatRHandlers.Register
+namespace CQRSLayer.Register
 {
-    public class RegisterHandler : IRequestHandler<RegisterQuery, RequestResult>
+    public class RegisterHandler : ICommandHandler<RegisterCommand>
     {
         private readonly UserManager<User> _userManager;
-        public RegisterHandler(UserManager<User> userManager)
+        private readonly IUserChatRepository _userChatRepository;
+        public RegisterHandler(UserManager<User> userManager, IUserChatRepository repository)
         {
             _userManager = userManager;
+            _userChatRepository = repository;
         }
 
-        public async Task<RequestResult> Handle(RegisterQuery request, CancellationToken cancellationToken)
+        public async Task<CommandResult> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-            var result = await _userManager.CreateAsync(new User()
+            var user = new User()
             {
                 DisplayName = request.DisplayName,
                 UserName = request.DisplayName,
                 Email = request.Email,
-            }, request.Password);
-
-            if (result.Succeeded) return new RequestResult
-            {
-                Succeeded = true,
-                Status = System.Net.HttpStatusCode.Created
             };
+            var result = await _userManager.CreateAsync(user, request.Password);
 
-            return new RequestResult
+            if (result.Succeeded)
+            {
+                _userChatRepository.AddChat(user.Id, user.Id);
+                return new CommandResult
+                {
+                    Succeeded = true,
+                    Status = System.Net.HttpStatusCode.Created
+                };
+            }
+
+            return new CommandResult
             {
                 Errors = result.Errors.Select(x => x.Description),
                 Succeeded = result.Succeeded,

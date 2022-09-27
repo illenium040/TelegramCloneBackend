@@ -5,11 +5,11 @@ using System.Net;
 using DatabaseLayer.Models;
 using MediatR.JWT;
 using MediatR.Handlers.Models;
-using MidiatRHandlers;
+using CQRSLayer;
 
 namespace MediatR.Handlers.Login
 {
-    public class LoginHandler : IRequestHandler<LoginQuery, RequestResult<UserModel>>
+    public class LoginHandler : ICommandHandler<LoginCommand, UserModel>
     {
 		private readonly UserManager<User> _userManager;
 		private readonly IJwtGenerator _jwtGenerator;
@@ -22,15 +22,14 @@ namespace MediatR.Handlers.Login
 			_jwtGenerator = gen;
 		}
 
-		public async Task<RequestResult<UserModel>> Handle(LoginQuery request, CancellationToken cancellationToken)
+		public async Task<CommandResult<UserModel>> Handle(LoginCommand request, CancellationToken cancellationToken)
 		{
 			var user = await _userManager.FindByEmailAsync(request.Email);
 			if (user == null)
 			{
-				return new RequestResult<UserModel>
+				return new CommandResult<UserModel>
 				{
-					Succeeded = false,
-					Status = HttpStatusCode.Unauthorized
+					Result = CommandResult.NotAuthorize()
 				};
 			}
 
@@ -38,7 +37,7 @@ namespace MediatR.Handlers.Login
 
 			if (result.Succeeded)
 			{
-				return new RequestResult<UserModel>
+				return new CommandResult<UserModel>
                 {
 					Data = new UserModel
 					{
@@ -47,14 +46,12 @@ namespace MediatR.Handlers.Login
 						DisplayName = user.DisplayName,
 						Id = user.Id,
 					},
-					Status = HttpStatusCode.OK,
-					Succeeded = true
+					Result = CommandResult.OK()
 				};
 			}
-			return new RequestResult<UserModel>
+			return new CommandResult<UserModel>
 			{
-				Succeeded = false,
-				Status = HttpStatusCode.Unauthorized,
+				Result = CommandResult.NotAuthorize()	
 			};
 		}
 	}

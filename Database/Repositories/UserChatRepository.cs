@@ -214,7 +214,7 @@ namespace DatabaseLayer.Repositories
         public bool BlockChat(string chatId, string userId)
         {
             var chat = GetSingleChatUser(chatId, userId);
-            chat.IsBlocked = !chat.IsNotified;
+            chat.IsBlocked = !chat.IsBlocked;
             _userContext.SaveChanges();
             return chat.IsBlocked;
         }

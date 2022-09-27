@@ -46,6 +46,15 @@ namespace TGBackend.Hubs
             _connectionRepository.OnConnect(userId, Context.ConnectionId,
                 Context.GetHttpContext().Request.Headers["User-Agent"]);
         }
+
+        public async Task SendToMe(MessageDTO message)
+        {
+            var sendedMsg = _messagingRepository.SendMessage(message, out ChatView reciever);
+            var msg = _messagingRepository.SendToUser(message);
+            message.Created = msg.Created;
+            message.State = msg.MessageState;
+            await Clients.Caller.SendAsync("SendToMe", message);
+        }
     }
 
 }

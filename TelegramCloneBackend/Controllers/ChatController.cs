@@ -3,12 +3,12 @@ using DatabaseLayer.Contexts;
 using DatabaseLayer.Models;
 using DatabaseLayer.Models.DTO;
 using MediatR;
-using MidiatRHandlers.Chat.GetWithMessages;
-using MidiatRHandlers;
-using MidiatRHandlers.Chat.GetChatList;
-using MidiatRHandlers.Chat.Create;
+using CQRSLayer.Chat.GetWithMessages;
+using CQRSLayer;
+using CQRSLayer.Chat.GetChatList;
+using CQRSLayer.Chat.Create;
 using Microsoft.AspNetCore.Authorization;
-using MidiatRHandlers.Chat.Delete;
+using CQRSLayer.Chat.Delete;
 using DatabaseLayer.Repositories.Base;
 
 namespace TGBackend.Controllers
@@ -28,55 +28,51 @@ namespace TGBackend.Controllers
 
 
         [HttpGet("messages/{chatId}")]
-        public async Task<RequestResult<ChatDTO>> GetChatWithMessages(string chatId) => await _mediator.Send(new ChatWithMessagesQuery { ChatId = chatId });
+        public async Task<CommandResult<ChatDTO>> GetChatWithMessages(string chatId) => await _mediator.Send(new GetMessagesCommand(chatId));
 
         [HttpGet("list/{userId}")]
-        public async Task<RequestResult<IEnumerable<ChatView>>> GetChatList(string userId) => await _mediator.Send(new ChatListQuery { UserId = userId });
+        public async Task<CommandResult<IEnumerable<ChatView>>> GetChatList(string userId) => await _mediator.Send(new GetChatListCommand(userId));
 
         [HttpPost("add")]
-        public async Task<RequestResult<string>> Create(ChatCreationQuery query) => await _mediator.Send(query);
+        public async Task<CommandResult<string>> Create(CreateChatCommand query) => await _mediator.Send(query);
 
         [HttpPost("delete")]
-        public async Task<RequestResult> Delete(ChatDeletionQuery query) => await _mediator.Send(query);
+        public async Task<CommandResult> Delete(DeleteChatCommand query) => await _mediator.Send(query);
 
         [HttpPost("archive")]
-        public async Task<RequestResult> Archive([FromQuery] string userId, [FromQuery] string chatId)
+        public async Task<CommandResult<bool>> Archive([FromQuery] string userId, [FromQuery] string chatId)
         {
-            return new RequestResult<bool>
+            return new CommandResult<bool>
             {
                 Data = _userChat.ArchiveChat(chatId, userId),
-                Status = System.Net.HttpStatusCode.OK,
-                Succeeded = true
+                Result = CommandResult.OK()
             };
         }
         [HttpPost("togglePin")]
-        public async Task<RequestResult> TogglePin([FromQuery] string userId, [FromQuery] string chatId)
+        public async Task<CommandResult<bool>> TogglePin([FromQuery] string userId, [FromQuery] string chatId)
         {
-            return new RequestResult<bool>
+            return new CommandResult<bool>
             {
                 Data = _userChat.TogglePin(chatId, userId),
-                Status = System.Net.HttpStatusCode.OK,
-                Succeeded = true
+                Result = CommandResult.OK()
             };
         }
         [HttpPost("toggleNotifications")]
-        public async Task<RequestResult> ToggleNotifications([FromQuery] string userId, [FromQuery] string chatId)
+        public async Task<CommandResult<bool>> ToggleNotifications([FromQuery] string userId, [FromQuery] string chatId)
         {
-            return new RequestResult<bool>
+            return new CommandResult<bool>
             {
                 Data = _userChat.ToggleNotifications(chatId, userId),
-                Status = System.Net.HttpStatusCode.OK,
-                Succeeded = true
+                Result = CommandResult.OK()
             };
         }
         [HttpPost("block")]
-        public async Task<RequestResult> Block([FromQuery] string userId, [FromQuery] string chatId)
+        public async Task<CommandResult<bool>> Block([FromQuery] string userId, [FromQuery] string chatId)
         {
-            return new RequestResult<bool>
+            return new CommandResult<bool>
             {
                 Data = _userChat.BlockChat(chatId, userId),
-                Status = System.Net.HttpStatusCode.OK,
-                Succeeded = true
+                Result = CommandResult.OK()
             };
         }
     }

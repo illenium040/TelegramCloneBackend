@@ -14,7 +14,7 @@ using DatabaseLayer.Repositories;
 using MediatR.Handlers.Login;
 using MediatR.JWT;
 using TGBackend.Hubs;
-using MidiatRHandlers.JWT;
+using CQRSLayer.JWT;
 using TelegramCloneBackend;
 using DatabaseLayer.Repositories.Base;
 using EFCoreSecondLevelCacheInterceptor;
@@ -153,7 +153,8 @@ var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
 using (var scope = scopeFactory.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    DbSeed.SeedUsers(userManager);
+    var repo = scope.ServiceProvider.GetRequiredService<IUserChatRepository>();
+    DbSeed.SeedUsers(userManager, repo);
 }
 
 app.Run();

@@ -7,26 +7,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MidiatRHandlers.Chat.Delete
+namespace CQRSLayer.Chat.Delete
 {
-    internal class ChatDeletionHandler : IRequestHandler<ChatDeletionQuery, RequestResult>
+    internal class DeleteChatHandler : ICommandHandler<DeleteChatCommand>
     {
         private readonly IUserChatRepository _userChatRepository;
-        public ChatDeletionHandler(IUserChatRepository userChatRepository)
+        public DeleteChatHandler(IUserChatRepository userChatRepository)
         {
             _userChatRepository = userChatRepository;
         }
 
-        public Task<RequestResult> Handle(ChatDeletionQuery request, CancellationToken cancellationToken)
+        public Task<CommandResult> Handle(DeleteChatCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 _userChatRepository.RemoveChat(request.ChatId, request.UserId);
-                return Task.FromResult(RequestResult.OK());
+                return Task.FromResult(CommandResult.OK());
             }
             catch(Exception e)
             {
-                return Task.FromResult(RequestResult.BadRequest(new List<string> { e.Message }));
+                return Task.FromResult(CommandResult.BadRequest(new List<string> { e.Message }));
             }
         }
     }

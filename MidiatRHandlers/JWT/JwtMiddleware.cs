@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MidiatRHandlers.JWT
+namespace CQRSLayer.JWT
 {
     public class JwtMiddleware
     {
