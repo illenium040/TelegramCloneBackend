@@ -30,15 +30,9 @@ builder.Services.AddCors(o => {
     o.AddDefaultPolicy(builder =>
     {
         builder
-        .SetIsOriginAllowed(origin =>
-        {
-            var host = new Uri(origin).Host;
-            Console.WriteLine(host);
-            return host == "localhost";
-        })
+        .AllowAnyOrigin()
         .AllowAnyMethod()
         .AllowAnyHeader()
-        .AllowCredentials();
     });
 });
 #if DEBUG
