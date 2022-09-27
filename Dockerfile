@@ -7,14 +7,14 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["TelegramCloneBackend/TelegramCloneBackend.csproj", "."]
+COPY ["TelegramCloneBackend/TelegramCloneBackend.csproj", "TelegramCloneBackend/"]
 RUN dotnet restore "TelegramCloneBackend/TelegramCloneBackend.csproj"
 COPY . .
-WORKDIR "/src/."
-RUN dotnet build "TelegramCloneBackend/TelegramCloneBackend.csproj" -c Release -o /app/build
+WORKDIR "/src/TelegramCloneBackend"
+RUN dotnet build "TelegramCloneBackend.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "TelegramCloneBackend/TelegramCloneBackend.csproj" -c Release -o /app/publish
+RUN dotnet publish "TelegramCloneBackend.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
