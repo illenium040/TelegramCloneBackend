@@ -31,16 +31,7 @@ builder.Configuration.AddKeyPerFile(directoryPath: "/etc/secrets", optional: tru
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
-builder.Services.AddCors(o => {
-    o.AddDefaultPolicy(builder =>
-    {
-        builder
-         .SetIsOriginAllowed(url => new Uri(url).Host == "localhost")
-         .AllowAnyMethod()
-         .AllowAnyHeader()
-         .AllowCredentials();
-    });
-});
+builder.Services.AddCors();
 #if DEBUG
 var connectionString = "Host=localhost;Port=5432;Database=Telegram;Username=postgres;Password=20612061";
 #else
@@ -154,7 +145,13 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseCors();
+app.UseCors(options =>
+{
+    options.WithOrigins("http://localhost:3000", "http://127.0.0.1:3000")
+         .AllowAnyMethod()
+         .AllowAnyHeader()
+         .AllowCredentials();
+});
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
