@@ -116,7 +116,7 @@ namespace DatabaseLayer.Repositories
                 Id = message.Id ?? Guid.NewGuid().ToString(),
                 ContentType = message.ContentType,
                 Receiver = message.UserIdTo,
-                MessageState = MessageState.SENDED_TO_SERVER
+                MessageState = MessageState.LOADING
             };
             chat.Messages.Add(msg);
             _chatContext.SaveChanges();
