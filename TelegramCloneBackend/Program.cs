@@ -22,7 +22,8 @@ using EasyCaching.InMemory;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("appsettings.json");
+builder.Configuration
+    .AddJsonFile("appsettings.json");
 #if !DEBUG
 builder.Configuration.AddKeyPerFile(directoryPath: "/etc/secrets", optional: true);
 #endif
@@ -34,9 +35,10 @@ builder.Services.AddCors(o => {
     o.AddDefaultPolicy(builder =>
     {
         builder
-        .AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader();
+         .SetIsOriginAllowed(url => new Uri(url).Host == "localhost")
+         .AllowAnyMethod()
+         .AllowAnyHeader()
+         .AllowCredentials();
     });
 });
 #if DEBUG
@@ -51,7 +53,7 @@ builder.Services.AddMvc(option =>
 {
     option.EnableEndpointRouting = false;
     var policy = new AuthorizationPolicyBuilder()
-                        .RequireAuthenticatedUser().RequireAuthenticatedUser().Build();
+                        .RequireAuthenticatedUser().Build();
     option.Filters.Add(new AuthorizeFilter(policy));
 });
 
