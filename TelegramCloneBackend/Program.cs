@@ -150,11 +150,12 @@ app.UseCors(options =>
     options.SetIsOriginAllowed((url) =>
             {
                 var uri = new Uri(url);
-                return uri.Host == "tgfrontend.onrender.com" || uri.Host == "localhost" || uri.Host == "127.0.0.1";
+                return uri.Host == "localhost" || uri.Host == "127.0.0.1";
             })
-         .AllowAnyMethod()
-         .AllowAnyHeader()
-         .AllowCredentials();
+             .AllowAnyMethod()
+             .AllowAnyHeader()
+             .AllowCredentials()
+             .WithOrigins("https://tgfrontend.onrender.com");
 });
 app.UseEndpoints(endpoints =>
 {
