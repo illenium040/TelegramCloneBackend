@@ -28,10 +28,23 @@ builder.Configuration
 builder.Configuration.AddKeyPerFile(directoryPath: "/etc/secrets", optional: true);
 #endif
 
-
 builder.Services.AddControllersWithViews();
 builder.Services.AddSignalR();
-builder.Services.AddCors();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CORS", builder =>
+    {
+        builder.SetIsOriginAllowed((url) =>
+                {
+                    var uri = new Uri(url);
+                    return uri.Host == "localhost" || uri.Host == "127.0.0.1";
+                })
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials()
+              .WithOrigins("https://tgfrontend.onrender.com");
+    });
+});
 #if DEBUG
 var connectionString = "Host=localhost;Port=5432;Database=Telegram;Username=postgres;Password=20612061";
 #else
@@ -145,18 +158,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseCors(options =>
-{
-    options.SetIsOriginAllowed((url) =>
-            {
-                var uri = new Uri(url);
-                return uri.Host == "localhost" || uri.Host == "127.0.0.1";
-            })
-             .AllowAnyMethod()
-             .AllowAnyHeader()
-             .AllowCredentials()
-             .WithOrigins("https://tgfrontend.onrender.com");
-});
+app.UseCors("CORS");
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
