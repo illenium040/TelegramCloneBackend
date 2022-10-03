@@ -128,7 +128,7 @@ namespace DatabaseLayer.Repositories
                     ChatId = message.ChatId,
                     LastMessage = msg.ToDTO(),
                     UnreadMessagesCount = 0,
-                    User = targetUser.ToDTO(),
+                    User = _manager.Users.Include(x => x.Chats).SingleOrDefault(x => x.Id == message.UserIdTo)?.ToDTO(),
                     ChatToUser = targetUser.Chats.SingleOrDefault(x => x.ChatId == message.ChatId)?.ToDTO()
                 };
             }
