@@ -147,7 +147,7 @@ app.UseAuthorization();
 
 app.UseCors(options =>
 {
-    options.WithOrigins("http://localhost:3000", "http://127.0.0.1:3000")
+    options.WithOrigins("http://localhost:3000", "http://127.0.0.1:3000", "https://tgfrontend.onrender.com")
          .AllowAnyMethod()
          .AllowAnyHeader()
          .AllowCredentials();
